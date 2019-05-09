@@ -1,7 +1,7 @@
 ---
 output: 
   word_document:
-    reference_docx: "common/word-styles-reference-01.docx"
+    reference_docx: "styles/word-styles-reference-01.docx"
 ---
 
 ```{r setup, include=FALSE}
