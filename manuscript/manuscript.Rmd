@@ -1,0 +1,70 @@
+---
+title: "Combining genomic prediction with citizen science for crop improvement and early selection in durum wheat"
+bibliography: "library/tricotgenomic.bib"
+csl: "library/citation-style.csl"
+output: 
+  word_document:
+    reference_docx: "library/word-styles-reference-01.docx"
+# output: pdf_document
+---
+
+
+Kauê de Sousa^1,2,^*, Matteo Dell’Acqua^3^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Dejene Mengistu^7^, Mario Enrico Pè^3^, [… add others], Jacob van Etten^2^, Svein Ø. Solberg^1^  
+^1^ Department of Agricultural Sciences, Inland Norway University of Applied Sciences, 2318 Hamar, Norway  
+^2^ Bioversity International, Costa Rica Office, 30501 Turrialba, Costa Rica   
+^3^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  
+^4^ Bioversity International, Ethiopia Office, 1000 Addis Ababa, Ethiopia  
+^5^ College of Agriculture and Life Sciences, Cornell University, 14853 Ithaca, USA  
+^6^ Agricultural Research Service, United States Department of Agriculture, 148532901, Ithaca, USA  
+^7^ Bioversity International, Nepal Office, 3055 Kathmandu, Nepal  
+
+
+
+**Research questions:**  
+
+* Is genomic selection with citizen science a viable approach?
+* Does the genetic information provide sufficient gain in the predictions for variety selection (given the cost)?
+* Can the combination of genomic and citizen science provide new insights in which traits farmers prioritise or which areas of the genome play a role?
+* Does genomic prediction using phenotypic data produced on station (agronomic traits, farmer preferences) improve accuracy in the field as measured in the tricot trial? 
+
+
+# Introduction
+
+* Crowdsourcing citizen science showed the ability to register the climate effects as they occurr in farms, with potential to be used in plant breeding programs and risk assessments for farm adaptation[@VanEtten2019].
+
+
+# Methods  
+
+## Model approaches
+
+
+Run a number of scenarios from varieties selection using the citizen science and station data to determine whether the genetic information provides any gain or not
+
+**Scenario 1**  
+
+Baseline: tricot without genomic prediction, blocked cross-validation with seasons as blocks
+
+* Plackett-Luce model
+* Bradley-Terry model. Improvement: same exercise, but adding genomic data as explanatory data
+* Plackett-Luce model with covariance matrix derived from genomic data
+* Bradley-Terry model with genomic random variables in a GLM framework(?)  
+
+**Scenario 2**  
+
+Baseline: farmer preferences from station rating exercise, predicting field performance in tricot perhaps stratifying by environment and using the two station sites separately for their respective most similar environments (to circumvent GxE).
+
+Predict rating data with an appropriate GLM model for ordinal data (the rates should not be assumed to be equidistant, the difference between rates 1 and 2 may be different from the rates between 4 and 5).
+
+Improvement: same farmer preferences + genomic data, letting the ordering be influenced by genomic relatedness
+The exercise could use rank correlation, Kendall´s tau as criterion, but could also make a real “selection” (say top 50%) of the accessions and determine the gain as the % that indeed falls in the top 50% in the tricot trial. A p value for this exercise could be determined by doing 10,000 random selections of 50% to get a null distribution.
+
+# Results  
+
+# Discussion 
+
+* What is the relative costs of these approaches
+* Is data missingness non-random? Can data missingness be predicted from farmer preferences? 
+* Can we say something about which genomic regions play a role?
+
+# References
+

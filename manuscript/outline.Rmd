@@ -1,14 +1,13 @@
 ---
+title: "Combining genomic prediction with citizen science for crop improvement, as case study with “early selection” in durum wheat"
 output: 
   word_document:
-    reference_docx: "styles/word-styles-reference-01.docx"
+    reference_docx: "library/word-styles-reference-01.docx"
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
-
-# Combining genomic prediction with citizen science for crop improvement, as case study with “early selection” in durum wheat
 
 # Authors:
 
