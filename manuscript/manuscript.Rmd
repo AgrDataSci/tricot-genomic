@@ -9,7 +9,7 @@ output:
 ---
 
 
-Kauê de Sousa^1,2,^*, Matteo Dell’Acqua^3^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Dejene Mengistu^7^, Mario Enrico Pè^3^, [… add others], Jacob van Etten^2^, Svein Ø. Solberg^1^  
+Kauê de Sousa^1,2,^*, Matteo Dell’Acqua^3^, Jacob van Etten^2^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Dejene Mengistu^7^, Mario Enrico Pè^3^, [… add others], Svein Ø. Solberg^1^  
 ^1^ Department of Agricultural Sciences, Inland Norway University of Applied Sciences, 2318 Hamar, Norway  
 ^2^ Bioversity International, Costa Rica Office, 30501 Turrialba, Costa Rica   
 ^3^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  

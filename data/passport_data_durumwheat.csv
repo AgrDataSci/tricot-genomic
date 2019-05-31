@@ -2,7 +2,7 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 5300,farmer variety,Oromia,MISRAK SHEWA,GIMBICHU,"Woberi, 35km E of Addis Abeba",39,9.066667,1982,FALSE,TRUE,1197.033333,1198
 5314,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,Koftu,38.866667,8.266667,1982,FALSE,TRUE,453.7,460.5
 5430,farmer variety,Oromia,MISRAK SHEWA,LOME,Ejere,39.25,8.783333,1984,FALSE,TRUE,927.4833333,927.5
-5503,farmer variety,Oromia,MISRAK SHEWA,LOME,Ejere,39.25,8.783333,1983,FALSE,TRUE,927.4833333,927.5
+5503,farmer variety,Oromia,MISRAK SHEWA,LOME,Ejere,39.25,8.783333,1983,TRUE,TRUE,927.4833333,927.5
 5588,farmer variety,Oromia,SEMEN SHEWA,BEREHNA ALELTU,9km Chefe Donsa to Sendafa,39.05,9.016667,1982,TRUE,TRUE,1165.133333,1165
 5611,farmer variety,Oromia,SEMEN SHEWA,BEREHNA ALELTU,"Riba, S of Sendafa",39.066667,9.05,1982,FALSE,TRUE,1207.466667,1210
 5622,farmer variety,Oromia,MISRAK SHEWA,GIMBICHU,5km Chefe Donsa to Sendafa,39.05,9.016667,1982,TRUE,TRUE,1165.133333,1165
@@ -12,7 +12,7 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 5679,farmer variety,Oromia,SEMEN SHEWA,MULONA SULULTA,"Chancho, 66km Addis Abeba to Fiche",37.483333,10.566667,1983,FALSE,TRUE,821.4166667,818
 5684,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,"Goro Gabriel, Dekako",39.1,8.966667,1983,TRUE,TRUE,1111.5,1114.5
 5690,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,SE Slope of Mt.Yerer,39.016667,8.9,1983,FALSE,TRUE,994.1166667,985.5
-6697,farmer variety,NA,NA,NA,NA,NA,NA,1982,FALSE,TRUE,NA,NA
+6697,farmer variety,NA,NA,NA,NA,NA,NA,1982,TRUE,TRUE,NA,NA
 6891,farmer variety,Oromia,BALE,GINIR,"9km, Ginir to Goro",40.783333,7.066667,1985,TRUE,TRUE,229.9833333,231
 7960,farmer variety,Amhara,SEMEN SHEWA,ANGOLELA TEANA ASAGR,25km Debre Berhan to Jihur,36.433333,9.65,1985,FALSE,TRUE,257.5666667,263
 8034,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,7km SE of Debre Zeyit,39.033333,8.616667,1985,TRUE,TRUE,639.8333333,635.5
@@ -25,13 +25,13 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 202012,farmer variety,NA,NA,NA,NA,NA,NA,NA,FALSE,TRUE,NA,NA
 202458,farmer variety,NA,NA,NA,NA,NA,NA,NA,FALSE,TRUE,NA,NA
 203674,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,39.016667,8.866667,1982,FALSE,TRUE,762.4,755.5
-203739,farmer variety,Oromia,MISRAK SHEWA,LUME,NA,39.766667,8.783333,1984,FALSE,TRUE,84.4,85.5
+203739,farmer variety,Oromia,MISRAK SHEWA,LUME,NA,39.766667,8.783333,1984,TRUE,TRUE,84.4,85.5
 203846,farmer variety,Oromia,MISRAK SHEWA,LUME,NA,39.25,8.783333,1984,FALSE,TRUE,927.4833333,927.5
 203889,farmer variety,Oromia,SEMEN SHEWA,MULONA SULULTA,NA,38.666667,9.266667,1984,FALSE,TRUE,1325.85,1324
 203940,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,39.1,8.966667,1984,TRUE,TRUE,1111.5,1114.5
 203989,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,39,8.816667,1982,FALSE,TRUE,627.75,624.5
 204353,farmer variety,NA,NA,NA,NA,NA,NA,NA,FALSE,TRUE,NA,NA
-204411,farmer variety,Oromia,ARSSI,MERTI,NA,39.783333,8.5,1982,FALSE,TRUE,360.0333333,360
+204411,farmer variety,Oromia,ARSSI,MERTI,NA,39.783333,8.5,1982,TRUE,TRUE,360.0333333,360
 204488,farmer variety,Oromia,SEMEN SHEWA,KEMBIBIT,NA,39.25,9.45,1982,TRUE,TRUE,1464.383333,1463
 204530,farmer variety,Oromia,SEMEN SHEWA,WUCHALENA JIDO,NA,38.816667,9.6,1982,FALSE,TRUE,1345.316667,1344
 204563,farmer variety,Oromia,SEMEN SHEWA,BEREHNA ALELTU,NA,38.983333,8.933333,1982,FALSE,TRUE,1158.883333,1161
@@ -66,13 +66,13 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 208159,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,2003,FALSE,TRUE,NA,NA
 208161,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,2003,FALSE,TRUE,NA,NA
 208162,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,2003,FALSE,TRUE,NA,NA
-208164,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,2003,FALSE,TRUE,NA,NA
+208164,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,2003,TRUE,TRUE,NA,NA
 208165,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,2003,FALSE,TRUE,NA,NA
 208167,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gebriel 10Km Titar Eyesus to Mota,NA,NA,NA,FALSE,TRUE,NA,NA
 208168,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gabriel,NA,NA,1999,FALSE,TRUE,NA,NA
 208170,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gabriel,NA,NA,2003,FALSE,TRUE,NA,NA
 208173,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gabriel,NA,NA,2003,TRUE,TRUE,NA,NA
-208175,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gabriel,NA,NA,2003,FALSE,TRUE,NA,NA
+208175,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gabriel,NA,NA,2003,TRUE,TRUE,NA,NA
 208179,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,Zachela Gabriel,NA,NA,2003,FALSE,TRUE,NA,NA
 208181,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,"Quami Cherk, Debrework to Mota",NA,NA,2003,FALSE,TRUE,NA,NA
 208182,farmer variety,Amhara,MISRAK GOJAM,ENARJ ENAWGA,"Quami Cherk, Debrework to Mota",NA,NA,2003,FALSE,TRUE,NA,NA
@@ -90,7 +90,7 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 208209,farmer variety,Amhara,MIRAB GOJAM,BURE WEMBERMA,Gusha Giorgis,NA,NA,NA,FALSE,TRUE,NA,NA
 208221,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 5 Km from DebreMarkos on the way to Addis,NA,NA,2003,FALSE,TRUE,NA,NA
 208222,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 5 Km from DebreMarkos on the way to Addis,NA,NA,2003,FALSE,TRUE,NA,NA
-208224,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 25 Km from DebreMarkos on the way to Addis,NA,NA,2003,FALSE,TRUE,NA,NA
+208224,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 25 Km from DebreMarkos on the way to Addis,NA,NA,2003,TRUE,TRUE,NA,NA
 208227,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 5 Km from DebreMarkos on the way to Addis,NA,NA,1992,FALSE,TRUE,NA,NA
 208228,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 5 Km from DebreMarkos on the way to Addis,NA,NA,1999,FALSE,TRUE,NA,NA
 208229,farmer variety,Amhara,MISRAK GOJAM,DEBRE MARKOS,Chemoga about 5 Km from DebreMarkos on the way to Addis,NA,NA,2003,FALSE,TRUE,NA,NA
@@ -271,7 +271,7 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 226922,farmer variety,SNNP,SEMEN OMO,BOREDA ABAYA,NA,37.75,6.516667,1987,FALSE,TRUE,196.9166667,189.5
 226928,farmer variety,Oromia,ARSSI,KOFELE,NA,38.933333,7.016667,1987,FALSE,TRUE,1266.6,1268.5
 226951,farmer variety,Amhara,DEBUB GONDAR,TACH GAYINT,NA,38.333333,11.666667,1987,FALSE,TRUE,1288.366667,1286
-226973,farmer variety,Oromia,ARSSI,ROBE,NA,39.616667,7.883333,1987,FALSE,TRUE,1132.233333,1131.5
+226973,farmer variety,Oromia,ARSSI,ROBE,NA,39.616667,7.883333,1987,TRUE,TRUE,1132.233333,1131.5
 227009,farmer variety,Oromia,ARSSI,SHERKA,NA,39.916667,8.316667,1987,FALSE,TRUE,1598.25,1601
 227029,farmer variety,Oromia,BORENA,YABELO,NA,NA,NA,1987,FALSE,TRUE,NA,NA
 227058,farmer variety,Oromia,BALE,SINANANA DINSHO,NA,NA,NA,1987,FALSE,TRUE,NA,NA
@@ -279,12 +279,12 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 227063,farmer variety,SNNP,HADIYA,SORO,NA,NA,NA,1987,FALSE,TRUE,NA,NA
 227066,farmer variety,NA,NA,NA,NA,NA,NA,1987,FALSE,TRUE,NA,NA
 227298,farmer variety,NA,NA,NA,NA,NA,NA,1993,FALSE,TRUE,NA,NA
-227314,farmer variety,NA,NA,NA,NA,NA,NA,1993,FALSE,TRUE,NA,NA
+227314,farmer variety,NA,NA,NA,NA,NA,NA,1993,TRUE,TRUE,NA,NA
 227317,farmer variety,NA,NA,NA,NA,NA,NA,1993,FALSE,TRUE,NA,NA
 227542,farmer variety,NA,NA,NA,NA,NA,NA,NA,TRUE,TRUE,NA,NA
 228135,farmer variety,SNNP,SEMEN OMO,SODO ZURIA,Kikate Marachre,NA,NA,1993,FALSE,TRUE,NA,NA
 228593,farmer variety,Amhara,MISRAK GOJAM,SHEBEL BERENTA,Goy Birbegn,NA,NA,1993,FALSE,TRUE,NA,NA
-228600,farmer variety,Amhara,MISRAK GOJAM,AWABEL,Arera,NA,NA,1993,FALSE,TRUE,NA,NA
+228600,farmer variety,Amhara,MISRAK GOJAM,AWABEL,Arera,NA,NA,1993,TRUE,TRUE,NA,NA
 228753,farmer variety,Oromia,MIRAB SHEWA,DENDI,Yimura Meti,38.03305556,8.817777778,1993,TRUE,TRUE,1654.694915,1675
 228762,farmer variety,Oromia,MIRAB SHEWA,AMBO,Bicho,NA,NA,1993,FALSE,TRUE,NA,NA
 228768,farmer variety,Oromia,MIRAB SHEWA,AMBO,Goljena Kenfel,NA,NA,1993,FALSE,TRUE,NA,NA
@@ -293,7 +293,7 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 229250,farmer variety,Amhara,SEMEN SHEWA,LAY BETNA TACH BET,Market,NA,NA,1993,FALSE,TRUE,NA,NA
 229251,farmer variety,Amhara,SEMEN SHEWA,LAY BETNA TACH BET,"Fetra 2km, from Fetra on the way to Alem ketema",NA,NA,1993,FALSE,TRUE,NA,NA
 229253,farmer variety,Amhara,SEMEN SHEWA,LAY BETNA TACH BET,"Buyo 5km, S.W  of Fetra town",NA,NA,1993,FALSE,TRUE,NA,NA
-231475,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,38.9,8.783333,1989,FALSE,TRUE,647.2666667,646
+231475,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,38.9,8.783333,1989,TRUE,TRUE,647.2666667,646
 231477,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,38.9,8.783333,1989,FALSE,TRUE,647.2666667,646
 231479,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,38.9,8.783333,1989,FALSE,TRUE,647.2666667,646
 231480,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,NA,38.9,8.783333,1989,FALSE,TRUE,647.2666667,646
@@ -368,6 +368,10 @@ accession,type,adm1,adm2,adm3,adm4,x,y,year_charac,select,from_gps,elev_mean,ele
 227056B,farmer variety,Amhara,MISRAK GOJAM,HULET EJ ENESE,NA,37.98055556,10.96,1987,TRUE,TRUE,1194.409836,1191
 238492A,farmer variety,Oromia,MISRAK SHEWA,ADA'A CHUKALA,Dibayu(Golbicha) 7km from Debre zeit on the way to Ziquala,38.91111111,8.698888889,NA,TRUE,TRUE,748.8709677,742.5
 6856B,farmer variety,Amhara,SEMEN GONDAR,ALEFA,9km S of Dengel Ber,37,11.966667,1985,TRUE,TRUE,566.0333333,564
+6584,farmer variety,,NA,NA,NA,NA,NA,NA,TRUE,FALSE,NA,NA
+237810,farmer variety,,NA,NA,NA,NA,NA,NA,TRUE,FALSE,NA,NA
+8117,farmer variety,,NA,NA,NA,NA,NA,NA,TRUE,FALSE,NA,NA
+5586,farmer variety,,NA,NA,NA,NA,NA,NA,TRUE,FALSE,NA,NA
 Arendato,modern,NA,NA,NA,NA,NA,NA,NA,FALSE,TRUE,NA,NA
 Assassa,modern,NA,NA,NA,NA,NA,NA,NA,TRUE,TRUE,NA,NA
 Bichena,modern,NA,NA,NA,NA,NA,NA,NA,FALSE,TRUE,NA,NA
