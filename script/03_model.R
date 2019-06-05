@@ -7,6 +7,9 @@ R <- to_rankings(items = df[paste0("variety_",letters[1:4])],
                  input = df[paste0("rank_variety_",letters[1:4])])
 
 
+
+dimnames(R)[2]
+
 adj <- PlackettLuce::adjacency(R)
 
 adj <- as.vector(adj)
