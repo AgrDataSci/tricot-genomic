@@ -329,6 +329,24 @@ df %<>%
          id = as.integer(as.factor(farmer)))
 
 
+# add genotype codes
+gnt <- "data/raw/whoiswho.diversity.panel.txt"
+gnt %<>%  
+  read_table2() %>% 
+  rename(accession = ID,
+         genotype = DNA_CODE) %>% 
+  select(accession, genotype)
+
+df %<>% 
+  merge(. , gnt, all.x = TRUE, by = "accession") %>% 
+  as_tibble()
+
+
+names(df)
+
+# organize colunm order
+df <- df[c(2,24,1,23,22,3:21)]
+
 write_csv(df, "data/durumwheat.csv")
 
 
