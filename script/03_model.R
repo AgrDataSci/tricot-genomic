@@ -2,48 +2,92 @@ library("tidyverse")
 library("magrittr")
 library("gosset")
 library("PlackettLuce")
-library("BradleyTerryScalable")
-library("igraph")
 
 
 df <- "data/durumwheat.csv"
 df %<>% 
   read_csv()
 
-R <- to_rankings(data = df,
+
+output <- "output/exploring/"
+dir.create(output, recursive = TRUE, showWarnings = FALSE)
+
+#.....................................
+#.....................................
+# farmer rank ####
+
+# create grouped rankings 
+G <- to_rankings(data = df,
                  items = "genotype",
                  input = "farmer_rank",
                  id = "id", 
                  grouped.rankings = TRUE)
 
+# add explanatory vars
+# to_rankings internaly order the rankings by their id 
+# so I will keep the unique values by id and combine with the 
+# grouped_rankings
+
+df %>% 
+  arrange(id) %>% 
+  distinct(id, .keep_all = TRUE) %>% 
+  select(year, region) -> 
+  expvar
+
+G <- cbind(G, expvar)
 
 
-mod <- pltree(R ~ 1, data = R, bonferroni = TRUE)
+mod <- pltree(G ~ ., data = G)
 
 summary(mod)
 
-plot_nodes(mod)
+probs <- worst_regret(mod)
 
-# check correlation between yield and farmer ranking
+probs %<>% 
+  rename(genotype = items,
+         pow_rank = win_probs) %>% 
+  select(-worst_regret)
+
+write_csv(probs, paste0(output, "probability_of_winning.csv"))
+
+#...........................
+#...........................
+# grain yield ####
+
+# remove NAs in grain yield
 df %>% 
   filter(!is.na(gy_gm)) -> 
-  yield
+  gy
 
 # only keep strict rankings of at least 2 distinct items
-yield %>%
-  group_by(farmer_no) %>%
-  summarise(keep = n_distinct(accession) >= 2) %>%
+gy %>%
+  group_by(id) %>%
+  summarise(keep = length(id)) %>%
+  mutate(keep = keep > 1) %>% 
   filter(keep) ->
   keep
 
 # apply the logical vector
-id <- yield$farmer_no %in% keep$farmer_no
+id <- gy$id %in% gy$id
 
 # keep selected observations
-yield <- yield[id,]
+gy <- gy[id,]
 
 
-FR <- to_rankings(data = yield,
+
+yr <- to_rankings(data = gy,
+                  items = "genotype",
+                  input = "gy_gm",
+                  id = "id", 
+                  grouped.rankings = TRUE)
+
+
+mod_gy <- pltree(yr ~ 1, data = yr)
+
+
+
+
+FR <- to_rankings(data = gy,
                   items = "genotype",
                   input = "farmer_rank",
                   id = "id", 
@@ -53,17 +97,17 @@ FR <- FR[1:length(FR), , as.grouped_rankings = FALSE]
 
 
 
-YR <- to_rankings(data = yield,
-                  items = "genotype",
-                  input = "gy_gm",
-                  id = "id", 
-                  grouped.rankings = TRUE)
+
+
+
+mod_y <- pltree(YR ~ 1, data = YR)
+
 
 YR <- YR[1:length(YR), , as.grouped_rankings = FALSE]
 
 kendallTau(FR, YR)
 
-
+worst_regret(mod_y)
 
 
 # dimnames(R)[2]

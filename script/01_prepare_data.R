@@ -64,7 +64,26 @@ out <- !df$accession %in% out
 df %<>% 
   filter(out)
 
-# create an id for each observation
+# add genotype codes
+g <- "data/raw/whoiswho.diversity.panel.txt"
+g %<>%  
+  read_table2() %>% 
+  rename(accession = ID,
+         genotype = DNA_CODE) %>% 
+  select(accession, genotype)
+
+
+df %<>%
+  mutate(accession = tolower(accession)) %>% 
+  merge(. , g, all.x = TRUE, by = "accession") %>% 
+  as_tibble()
+
+# drop bread wheat genotypes
+# those with _B at the end of each genotype code
+df %<>% 
+  filter(!grepl("_B", genotype))
+
+# create an id for each plot and remove duplicates
 df %<>% 
   mutate(id = paste(plot_no, farmer, sep = "-")) 
 
@@ -75,6 +94,7 @@ df <-
 df %<>% 
   group_by(farmer_no) %>% 
   distinct(accession, .keep_all = TRUE) %>% 
+  distinct(farmer_rank, .keep_all = TRUE) %>% 
   as_tibble()
 
 # only keep strict rankings of at least 2 distinct items
@@ -92,21 +112,6 @@ n <- nrow(keep)
 
 # keep selected observations
 df <- df[id,]
-
-
-# add genotype codes
-g <- "data/raw/whoiswho.diversity.panel.txt"
-g %<>%  
-  read_table2() %>% 
-  rename(accession = ID,
-         genotype = DNA_CODE) %>% 
-  select(accession, genotype)
-
-
-df %<>%
-  mutate(accession = tolower(accession)) %>% 
-  merge(. , g, all.x = TRUE, by = "accession") %>% 
-  as_tibble()
 
 # ..........................................
 # ..........................................
