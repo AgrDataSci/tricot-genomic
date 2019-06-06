@@ -42,6 +42,9 @@ df <- df[drop]
 df %<>% 
   mutate(accession = ifelse(accession == "Hetosa",
                             "Hitosa", 
+                            accession),
+         accession = ifelse(accession == "Assassa",
+                            "Asassa", 
                             accession))
 
 
@@ -90,6 +93,20 @@ n <- nrow(keep)
 # keep selected observations
 df <- df[id,]
 
+
+# add genotype codes
+g <- "data/raw/whoiswho.diversity.panel.txt"
+g %<>%  
+  read_table2() %>% 
+  rename(accession = ID,
+         genotype = DNA_CODE) %>% 
+  select(accession, genotype)
+
+
+df %<>%
+  mutate(accession = tolower(accession)) %>% 
+  merge(. , g, all.x = TRUE, by = "accession") %>% 
+  as_tibble()
 
 # ..........................................
 # ..........................................
@@ -295,8 +312,8 @@ boxplot(df$gy_gm ~ df$accession, las = 2)
 y <- split(df, df$accession)
 
 y <- lapply(y, function(x) {
-  
-  x[,c(18:21)] <- lapply(x[,c(18:21)], function(z) {
+  i <- c("mean_tn","mean_seed_no_spike","mean_sl","gy_gm")
+  x[,i] <- lapply(x[,i], function(z) {
 
     out <- boxplot.stats(z)$out
     
@@ -329,23 +346,15 @@ df %<>%
          id = as.integer(as.factor(farmer)))
 
 
-# add genotype codes
-gnt <- "data/raw/whoiswho.diversity.panel.txt"
-gnt %<>%  
-  read_table2() %>% 
-  rename(accession = ID,
-         genotype = DNA_CODE) %>% 
-  select(accession, genotype)
+names(df)
+# organize colunm order
+first <- c("id","genotype","accession","plot_no","plot_id","farmer_no")
+
+df <- df[c(match(first, names(df)),
+           which(!names(df) %in% first))] 
 
 df %<>% 
-  merge(. , gnt, all.x = TRUE, by = "accession") %>% 
-  as_tibble()
-
-
-names(df)
-
-# organize colunm order
-df <- df[c(2,24,1,23,22,3:21)]
+  arrange(id)
 
 write_csv(df, "data/durumwheat.csv")
 
