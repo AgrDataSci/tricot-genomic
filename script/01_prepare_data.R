@@ -273,6 +273,12 @@ df %<>%
 # ..........................................
 # ..........................................
 # Check agronomic data ####
+
+# add plot size
+df %<>% 
+  mutate(plot_size = ifelse(year == 2013, 0.4, 1.6),
+         gy_gm = gy_gm / plot_size)
+
 # mean tiller number
 boxplot(df$mean_tn ~ df$accession, las = 2)
 
@@ -315,8 +321,9 @@ boxplot(y$gy_gm ~ y$accession, las = 2)
 
 df <- y
 
+boxplot(df$gy_gm ~ df$accession, las = 2)
 
-# reshape data
+# id into integers
 df %<>% 
   mutate(plot_id = as.integer(as.factor(id)),
          id = as.integer(as.factor(farmer)))
