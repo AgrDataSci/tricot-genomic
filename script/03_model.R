@@ -39,16 +39,12 @@ G <- cbind(G, expvar)
 
 mod <- pltree(G ~ ., data = G)
 
-summary(mod)
+winprobs <- predict(mod)  
+winprobs <- apply(winprobs, 2, mean)
 
-probs <- worst_regret(mod)
+winprobs <- bind_cols(genotype = names(winprobs),
+                      pow_rank = winprobs)
 
-probs %<>% 
-  rename(genotype = items,
-         pow_rank = win_probs) %>% 
-  select(-worst_regret)
-
-write_csv(probs, paste0(output, "probability_of_winning.csv"))
 
 #...........................
 #...........................
@@ -68,47 +64,56 @@ gy %>%
   keep
 
 # apply the logical vector
-id <- gy$id %in% gy$id
+id <- gy$id %in% keep$id
 
 # keep selected observations
 gy <- gy[id,]
 
 
-
-yr <- to_rankings(data = gy,
+YR <- to_rankings(data = gy,
                   items = "genotype",
                   input = "gy_gm",
                   id = "id", 
                   grouped.rankings = TRUE)
 
 
-mod_gy <- pltree(yr ~ 1, data = yr)
+mod_gy <- pltree(YR ~ 1, data = YR)
+
+winprobs_gy <- predict(mod_gy)  
+winprobs_gy <- apply(winprobs_gy, 2, mean)
+
+winprobs_gy <- bind_cols(genotype = names(winprobs_gy),
+                         pow_gy = winprobs_gy)
 
 
+winprobs %<>% 
+  merge(. , winprobs_gy, all.x = TRUE) %>% 
+  as_tibble()
 
 
+write_csv(winprobs, paste0(output, "probability_of_winning.csv"))
+
+
+# ...................................
+# ...................................
+# farmer rank vs yield ####
+
+# yield rankings into a parsed matrix
+YR <- YR[1:length(YR),,as.grouped_rankings = FALSE]
+
+# farmer ranking into a PL object
 FR <- to_rankings(data = gy,
                   items = "genotype",
                   input = "farmer_rank",
                   id = "id", 
                   grouped.rankings = TRUE)
 
+# then into a parsed matrix 
 FR <- FR[1:length(FR), , as.grouped_rankings = FALSE]
 
+kendall <- kendallTau(FR, YR)
 
-
-
-
-
-mod_y <- pltree(YR ~ 1, data = YR)
-
-
-YR <- YR[1:length(YR), , as.grouped_rankings = FALSE]
-
-kendallTau(FR, YR)
-
-worst_regret(mod_y)
-
+write_csv(kendall, paste0(output, "kendall_correlation.csv"))
 
 # dimnames(R)[2]
 # 
