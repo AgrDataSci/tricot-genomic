@@ -36,14 +36,12 @@ df %>%
 
 G <- cbind(G, expvar)
 
-
 mod <- pltree(G ~ ., data = G)
 
-winprobs <- predict(mod, log = TRUE)  
-winprobs <- apply(winprobs, 2, mean)
+winprobs <- itempar(mod, log = TRUE)
 
-winprobs <- bind_cols(genotype = names(winprobs),
-                      pow_rank = winprobs)
+winprobs <- bind_cols(genotype = dimnames(winprobs)[[2]],
+                      pow_rank = as.vector(winprobs))
 
 
 #...........................
@@ -79,12 +77,11 @@ YR <- to_rankings(data = gy,
 
 mod_gy <- pltree(YR ~ 1, data = YR)
 
-winprobs_gy <- predict(mod_gy, log = TRUE)  
-winprobs_gy <- apply(winprobs_gy, 2, mean)
 
-winprobs_gy <- bind_cols(genotype = names(winprobs_gy),
-                         pow_gy = winprobs_gy)
+winprobs_gy <- itempar(mod_gy, log = TRUE)
 
+winprobs_gy <- bind_cols(genotype = dimnames(winprobs_gy)[[2]],
+                         pow_gy = as.vector(winprobs_gy))
 
 winprobs %<>% 
   merge(. , winprobs_gy, all.x = TRUE) %>% 
