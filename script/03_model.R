@@ -39,7 +39,7 @@ G <- cbind(G, expvar)
 
 mod <- pltree(G ~ ., data = G)
 
-winprobs <- predict(mod)  
+winprobs <- predict(mod, log = TRUE)  
 winprobs <- apply(winprobs, 2, mean)
 
 winprobs <- bind_cols(genotype = names(winprobs),
@@ -79,7 +79,7 @@ YR <- to_rankings(data = gy,
 
 mod_gy <- pltree(YR ~ 1, data = YR)
 
-winprobs_gy <- predict(mod_gy)  
+winprobs_gy <- predict(mod_gy, log = TRUE)  
 winprobs_gy <- apply(winprobs_gy, 2, mean)
 
 winprobs_gy <- bind_cols(genotype = names(winprobs_gy),
