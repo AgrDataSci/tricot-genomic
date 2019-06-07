@@ -298,7 +298,9 @@ df %<>%
 
 # add plot size
 df %<>% 
-  mutate(plot_size = ifelse(year == 2013, 0.4, 1.6),
+  mutate(plot_size = ifelse(year == 2013, 0.4, 
+                            ifelse(year == 2014, 1.6,
+                                   ifelse(year == 2015, 1.2, NA))),
          gy_gm = gy_gm / plot_size)
 
 # mean tiller number
