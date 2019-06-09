@@ -1,28 +1,32 @@
 ####################################################
 ###### Read and clean durum wheat in Ethiopia
-# Updated 06Jun2019
+# Updated 07Jun2019
 ####################################################
 
 library("tidyverse")
-library("readxl")
 library("magrittr")
+library("readxl")
 library("janitor")
 library("sf")
 
 # ..........................................
 # ..........................................
 # file with some pre-debuged variables ####
-df <- "data/raw/climmob_ethiopia_2017.csv"
+df <- "data/raw/DataSheet_CS_All_FINAL.csv"
 df %<>% 
-  read_csv(., 
-           na = c("#VALUE!", "NA", "<NA>", ""))
+  read.csv(.,
+           na.strings = c("NA", " ", "missing","?","#DIV/0!","#REF!")) %>% 
+  as_tibble()
+
+
+df
 
 # tidy up the colnames
 df %<>% 
   as_tibble(.name_repair = janitor::make_clean_names) %>%
   rename(lon = longtiude,
-         lat = latitude) %>% 
-  select(-genotype)
+         lat = latitude)
+
 
 # drop all missing rankings or rankings with missing Accession (item id)
 df %<>%
@@ -30,15 +34,15 @@ df %<>%
 
 # drop some variables
 names(df)
-drop <- c("no" , "code_region" , "code_year" , "code_zone" , "code_district",
-          "code_kebelle" , "altitude" , "code_farmer" , "sex" , "code_accession",
-          "days2maturity" , "gy_gm" , "biomass_gm")
+drop <- c("no" , "altitude" , "sex" , "code_accession",
+          "days2maturity" )
+
 
 drop <- !names(df) %in% drop
 
 df <- df[drop]
 
-# rename variety Hetosa
+# rename variety Hetosa and Assasa
 df %<>% 
   mutate(accession = ifelse(accession == "Hetosa",
                             "Hitosa", 
@@ -50,110 +54,6 @@ df %<>%
 
 # ..........................................
 # ..........................................
-# Drop variables not genotyped ####
-out <- "data/raw/not_in_genotyping.csv"
-out %<>% 
-  read_csv() %>% 
-  select(accession) %>% 
-  t()
-
-
-out <- !df$accession %in% out
-
-# retain the observations with genotype data
-df %<>% 
-  filter(out)
-
-# add genotype codes
-g <- "data/raw/whoiswho.diversity.panel.txt"
-g %<>%  
-  read_table2() %>% 
-  rename(accession = ID,
-         genotype = DNA_CODE) %>% 
-  select(accession, genotype)
-
-
-df %<>%
-  mutate(accession = tolower(accession)) %>% 
-  merge(. , g, all.x = TRUE, by = "accession") %>% 
-  as_tibble()
-
-# drop bread wheat genotypes
-# those with _B at the end of each genotype code
-df %<>% 
-  filter(!grepl("_B", genotype))
-
-# create an id for each plot and remove duplicates
-df %<>% 
-  mutate(id = paste(plot_no, farmer, sep = "-")) 
-
-# remove all entries that have duplicates 
-df <-
-  df[!(duplicated(df$id) | duplicated(df$id, fromLast = TRUE)), ]
-
-df %<>% 
-  group_by(farmer_no) %>% 
-  distinct(accession, .keep_all = TRUE) %>% 
-  distinct(farmer_rank, .keep_all = TRUE) %>% 
-  as_tibble()
-
-# only keep strict rankings of at least 2 distinct items
-df %>%
-  group_by(farmer_no) %>%
-  summarise(keep = n_distinct(accession) >= 2) %>%
-  filter(keep) ->
-  keep
-
-# apply the logical vector
-id <- df$farmer_no %in% keep$farmer_no
-
-# take rankings
-n <- nrow(keep)
-
-# keep selected observations
-df <- df[id,]
-
-# ..........................................
-# ..........................................
-# Add plating dates ####
-# planting dates 
-pdate <- "data/raw/ethiopia_planting_dates.csv"
-pdate %<>% 
-  read_csv() %>% 
-  as_tibble(.name_repair = janitor::make_clean_names)
-
-df %<>% 
-  merge(., pdate[,c("farmer","planting_date")], 
-        by = "farmer", all.x=TRUE) %>% 
-  as_tibble()
-  
-df %<>% 
-  mutate(planting_date = as.Date(planting_date, "%d/%m/%Y"),
-         planting_date = as.integer(planting_date))
-
-# fill missing planting dates with average per year
-for(i in seq_along(unique(df$year))){
-  
-  y_i <- unique(df$year)[i]
-  # check which value is the closest to the mean
-  # and get the centroid
-  z <- mean(df$planting_date[df$year == y_i], na.rm = TRUE)
-  z <- unlist(df[df$year == y_i, "planting_date"] - z)
-  z <- df[[which.min(abs(z)), "planting_date"]]
-  
-  df$planting_date <- ifelse(is.na(df$planting_date) & df$year == y_i,
-                             z,
-                             df$planting_date)
-
-}
-
-df %<>% 
-  mutate(planting_date = as.Date(planting_date, origin = "1970-01-01"),
-         year = as.integer(strftime(planting_date, "%Y")))
-
-
-# .......................................
-# .......................................
 # Debug lon lat data ####
 #lon lat 
 sum(is.na(df[,c("lon","lat")]))
@@ -162,9 +62,7 @@ df %<>%
   mutate(lon = ifelse(is.na(lat), NA, lon),
          lat = ifelse(is.na(lon), NA, lat))
 
-sum(is.na(df[,c("lon","lat")]))
-
-# Download an outline of ethiopia
+# Download country border of ethiopia
 raster::getData("GADM", country = "ETH", path = "data", level = 0) %>% 
   st_as_sf() -> eth
 
@@ -259,6 +157,115 @@ plot(eth["GID_0"], col = "lightgrey", reset = FALSE)
 plot(lonlat, col = "blue", cex = 1,
      bg = "Steelblue1", pch = 21, add = TRUE)
 
+
+
+# .......................................
+# .......................................
+
+# Add plating dates ####
+# planting dates 
+pdate <- "data/raw/ethiopia_planting_dates.csv"
+pdate %<>% 
+  read_csv() %>% 
+  as_tibble(.name_repair = janitor::make_clean_names)
+
+df %<>% 
+  merge(., pdate[,c("farmer","planting_date","x","y")], 
+        by = "farmer", all.x=TRUE) %>% 
+  as_tibble()
+
+df %<>% 
+  mutate(planting_date = as.Date(planting_date, "%d/%m/%Y"),
+         planting_date = as.integer(planting_date))
+
+# fill missing planting dates with average per year
+for(i in seq_along(unique(df$year))){
+  
+  y_i <- unique(df$year)[i]
+  # check which value is the closest to the mean
+  # and get the centroid
+  z <- mean(df$planting_date[df$year == y_i], na.rm = TRUE)
+  z <- unlist(df[df$year == y_i, "planting_date"] - z)
+  z <- df[[which.min(abs(z)), "planting_date"]]
+  
+  df$planting_date <- ifelse(is.na(df$planting_date) & df$year == y_i,
+                             z,
+                             df$planting_date)
+  
+}
+
+df %<>% 
+  mutate(planting_date = as.Date(planting_date, origin = "1970-01-01"),
+         year = as.integer(strftime(planting_date, "%Y")))
+
+sum(is.na(df$planting_date))
+
+
+# .......................................
+# .......................................
+# Keep consistent observations #### 
+
+out <- "data/raw/not_in_genotyping.csv"
+out %<>% 
+  read_csv() %>% 
+  select(accession) %>% 
+  t()
+
+
+out <- !df$accession %in% out
+
+# retain the observations with genotype data
+df %<>% 
+  filter(out)
+
+# add genotype codes
+g <- "data/raw/whoiswho.diversity.panel.txt"
+g %<>%  
+  read_table2() %>% 
+  rename(accession = ID,
+         genotype = DNA_CODE) %>% 
+  select(accession, genotype)
+
+
+df %<>%
+  mutate(accession = tolower(accession)) %>% 
+  merge(. , g, all.x = TRUE, by = "accession") %>% 
+  as_tibble()
+
+# drop bread wheat genotypes
+# those with _B at the end of each genotype code
+df %<>% 
+  filter(!grepl("_B", genotype))
+
+# create an id for each plot and remove duplicates
+df %<>% 
+  mutate(id = paste(plot_no, farmer, sep = "-")) 
+
+# remove all entries that have duplicates 
+df <-
+  df[!(duplicated(df$id) | duplicated(df$id, fromLast = TRUE)), ]
+
+df %<>% 
+  group_by(farmer_no) %>% 
+  distinct(accession, .keep_all = TRUE) %>% 
+  distinct(farmer_rank, .keep_all = TRUE) %>% 
+  as_tibble()
+
+# only keep strict rankings of at least 2 distinct items
+df %>%
+  group_by(farmer_no) %>%
+  summarise(keep = n_distinct(accession) >= 2) %>%
+  filter(keep) ->
+  keep
+
+# apply the logical vector
+id <- df$farmer_no %in% keep$farmer_no
+
+# take rankings
+n <- nrow(keep)
+
+# keep selected observations
+df <- df[id,]
 
 # .......................................
 # .......................................

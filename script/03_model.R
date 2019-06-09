@@ -112,6 +112,7 @@ kendall <- kendallTau(FR, YR)
 
 write_csv(kendall, paste0(output, "kendall_correlation.csv"))
 
+
 # dimnames(R)[2]
 # 
 # adj <- PlackettLuce::adjacency(R)

@@ -1,4 +1,4 @@
-Year,Region,Zone,District,Kebele,Farmer,lat,lon,planting_date
+Year,Region,Zone,District,Kebele,Farmer,y,x,planting_date
 2014,Oromia,East Oromia,Gimbichu,Argoba,Dachasa Yamii,8.949278,39.182111,2014-08-17
 2014,Oromia,East Oromia,Gimbichu,Argoba,Getachew Biru,8.948417,39.192083,2014-07-27
 2014,Oromia,East Oromia,Gimbichu,Argoba,Tafari Girma,8.951139,39.179833,2014-08-04
