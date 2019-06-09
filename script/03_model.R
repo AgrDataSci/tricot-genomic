@@ -38,6 +38,8 @@ G <- cbind(G, expvar)
 
 mod <- pltree(G ~ ., data = G)
 
+plot(mod)
+
 winprobs <- itempar(mod, log = TRUE)
 
 winprobs <- bind_cols(genotype = dimnames(winprobs)[[2]],
@@ -111,7 +113,6 @@ FR <- FR[1:length(FR), , as.grouped_rankings = FALSE]
 kendall <- kendallTau(FR, YR)
 
 write_csv(kendall, paste0(output, "kendall_correlation.csv"))
-
 
 # dimnames(R)[2]
 # 

@@ -1,11 +1,10 @@
 ####################################################
 ###### Read and clean durum wheat in Ethiopia
-# Updated 07Jun2019
+# Updated 09un2019
 ####################################################
 
 library("tidyverse")
 library("magrittr")
-library("readxl")
 library("janitor")
 library("sf")
 
@@ -15,28 +14,21 @@ library("sf")
 df <- "data/raw/DataSheet_CS_All_FINAL.csv"
 df %<>% 
   read.csv(.,
-           na.strings = c("NA", " ", "missing","?","#DIV/0!","#REF!")) %>% 
-  as_tibble()
-
-
-df
-
-# tidy up the colnames
-df %<>% 
+           na.strings = c("NA","", " ", "missing","?","#DIV/0!","#REF!")) %>% 
   as_tibble(.name_repair = janitor::make_clean_names) %>%
   rename(lon = longtiude,
-         lat = latitude)
+         lat = latitude) %>% 
+  mutate_if(is.factor, as.character)
 
 
-# drop all missing rankings or rankings with missing Accession (item id)
+# drop all missing rankings or rankings with missing accession
 df %<>%
   filter(!is.na(farmer_rank) & !is.na(accession))
 
 # drop some variables
 names(df)
-drop <- c("no" , "altitude" , "sex" , "code_accession",
-          "days2maturity" )
 
+drop <- c("no","altitude","sex","code_accession","days2maturity")
 
 drop <- !names(df) %in% drop
 
@@ -50,7 +42,7 @@ df %<>%
          accession = ifelse(accession == "Assassa",
                             "Asassa", 
                             accession))
-
+summary(as.factor(df$accession))
 
 # ..........................................
 # ..........................................
@@ -66,19 +58,19 @@ df %<>%
 raster::getData("GADM", country = "ETH", path = "data", level = 0) %>% 
   st_as_sf() -> eth
 
-plot(eth["GID_0"], col = "lightgrey")
-
-df %>% 
-  select(lon, lat) %>%  
-  filter(!is.na(lon)) %>% 
-  as.matrix() %>% 
-  st_multipoint() %>%
-  st_sfc(crs = st_crs(eth)) -> 
-  lonlat
-
-plot(eth["GID_0"], col = "lightgrey", reset = FALSE)
-plot(lonlat, col = "blue", cex = 1, 
-     bg = "Steelblue1", pch = 21, add = TRUE)
+# plot(eth["GID_0"], col = "lightgrey")
+# 
+# df %>% 
+#   select(lon, lat) %>%  
+#   filter(!is.na(lon)) %>% 
+#   as.matrix() %>% 
+#   st_multipoint() %>%
+#   st_sfc(crs = st_crs(eth)) -> 
+#   lonlat
+# 
+# plot(eth["GID_0"], col = "lightgrey", reset = FALSE)
+# plot(lonlat, col = "blue", cex = 1, 
+#      bg = "Steelblue1", pch = 21, add = TRUE)
 
 
 # fill NAs using comunity centroid 
@@ -158,47 +150,78 @@ plot(lonlat, col = "blue", cex = 1,
      bg = "Steelblue1", pch = 21, add = TRUE)
 
 
-
 # .......................................
 # .......................................
-
-# Add plating dates ####
+# Fix planting dates ####
 # planting dates 
-pdate <- "data/raw/ethiopia_planting_dates.csv"
-pdate %<>% 
-  read_csv() %>% 
-  as_tibble(.name_repair = janitor::make_clean_names)
+
+df %>% 
+  select(sowing_date) %>% 
+  mutate(sowing_date = as.character(sowing_date)) ->
+  date
+
+date %<>% 
+  mutate(sowing_date = gsub("[/]|[.]","-", sowing_date)) %>% 
+  separate(., sowing_date, into = c("x","y","z"), sep = "-") %>% 
+  mutate_all(as.integer)
+
+summary(as.factor(date$x))
+summary(as.factor(date$y))
+summary(as.factor(date$z))
+
+# planting dates must be between month 7 and 8
+date %<>% 
+  mutate(y = ifelse(y < 7 , 8, y),
+         y = ifelse(y > 8, 8, y))
+
+summary(as.factor(date$x))
+summary(as.factor(date$y))
+summary(as.factor(date$z))
+
+date %<>% 
+  mutate(planting_date = ifelse(x > 2000, paste(x, y, z, sep = "-"),
+                              ifelse(z > 2000, paste(z, y, x, sep = "-"), NA)))
 
 df %<>% 
-  merge(., pdate[,c("farmer","planting_date","x","y")], 
-        by = "farmer", all.x=TRUE) %>% 
-  as_tibble()
-
-df %<>% 
-  mutate(planting_date = as.Date(planting_date, "%d/%m/%Y"),
+  mutate(planting_date = date$planting_date,
+         planting_date = as.Date(planting_date, format = "%Y-%m-%d"), 
          planting_date = as.integer(planting_date))
 
+summary(as.factor(df$planting_date))
+
+
+varing <- sort(unique(df$year))
 # fill missing planting dates with average per year
-for(i in seq_along(unique(df$year))){
-  
-  y_i <- unique(df$year)[i]
+for(i in seq_along(varing)){
+  y_i <- varing[i]
   # check which value is the closest to the mean
   # and get the centroid
-  z <- mean(df$planting_date[df$year == y_i], na.rm = TRUE)
-  z <- unlist(df[df$year == y_i, "planting_date"] - z)
-  z <- df[[which.min(abs(z)), "planting_date"]]
+  df %>% 
+    filter(year == y_i) %>% 
+    filter(!is.na(planting_date)) ->
+    x
   
-  df$planting_date <- ifelse(is.na(df$planting_date) & df$year == y_i,
-                             z,
-                             df$planting_date)
+  z <- mean(x$planting_date)
+  z <- unlist(x[, "planting_date"] - z)
+  z <- x[[which.min(abs(z)), "planting_date"]]
+  
+  df %<>% 
+    mutate(planting_date = ifelse(is.na(planting_date) & year == y_i,
+                                  z,
+                                  planting_date))
   
 }
 
+rm(x)
+
 df %<>% 
   mutate(planting_date = as.Date(planting_date, origin = "1970-01-01"),
-         year = as.integer(strftime(planting_date, "%Y")))
+         year = as.integer(strftime(planting_date, "%Y"))) %>% 
+  select(-sowing_date)
 
 sum(is.na(df$planting_date))
+
+plot(df$planting_date)
 
 
 # .......................................
@@ -224,42 +247,43 @@ g %<>%
   read_table2() %>% 
   rename(accession = ID,
          genotype = DNA_CODE) %>% 
-  select(accession, genotype)
+  select(accession, genotype) %>% 
+  filter(!is.na(genotype)) %>% 
+  filter(!grepl("_B", genotype))
 
 
 df %<>%
   mutate(accession = tolower(accession)) %>% 
   merge(. , g, all.x = TRUE, by = "accession") %>% 
-  as_tibble()
+  as_tibble() %>% 
+  filter(!is.na(genotype))
 
-# drop bread wheat genotypes
-# those with _B at the end of each genotype code
-df %<>% 
-  filter(!grepl("_B", genotype))
 
 # create an id for each plot and remove duplicates
 df %<>% 
-  mutate(id = paste(plot_no, farmer, sep = "-")) 
+  mutate(plot_id = paste(genotype, farmer, year, sep = "-"),
+         id = as.integer(as.factor(farmer))) %>% 
+  arrange(id)
 
 # remove all entries that have duplicates 
 df <-
-  df[!(duplicated(df$id) | duplicated(df$id, fromLast = TRUE)), ]
+  df[!(duplicated(df$plot_id) | duplicated(df$plot_id, fromLast = TRUE)), ]
 
 df %<>% 
-  group_by(farmer_no) %>% 
-  distinct(accession, .keep_all = TRUE) %>% 
+  group_by(id) %>% 
+  distinct(genotype, .keep_all = TRUE) %>% 
   distinct(farmer_rank, .keep_all = TRUE) %>% 
   as_tibble()
 
 # only keep strict rankings of at least 2 distinct items
 df %>%
-  group_by(farmer_no) %>%
-  summarise(keep = n_distinct(accession) >= 2) %>%
+  group_by(id) %>%
+  summarise(keep = n_distinct(genotype) >= 2) %>%
   filter(keep) ->
   keep
 
 # apply the logical vector
-id <- df$farmer_no %in% keep$farmer_no
+id <- df$id %in% keep$id
 
 # take rankings
 n <- nrow(keep)
@@ -267,45 +291,22 @@ n <- nrow(keep)
 # keep selected observations
 df <- df[id,]
 
-# .......................................
-# .......................................
-# Dataset with extra variables ####
-extra <- "data/raw/DataSheet_CS_All_FINAL.xlsx"
-extra %<>% 
-  read_excel(., 
-             sheet = "data",
-             range = cell_cols("A:AA"),
-             na = c("NA", " ", "missing","?")) %>% 
-  as_tibble(.name_repair = janitor::make_clean_names)
-
-
-# add id
-extra %<>% 
-  mutate(id = paste(plot_no, farmer, sep = "-"))
-
-# remove all values with duplicates
-# remove all entries that have duplicates 
-extra <-
-  extra[!(duplicated(extra$id) | duplicated(extra$id, fromLast = TRUE)), ]
-
-# select variables
-extra %<>% 
-  select(booting_date:id) %>% 
-  select(-seedwt_500)
-
-# combine with main dataframe
 df %<>% 
-  merge(. , extra, by = "id", all.x = TRUE) %>% 
-  as_tibble()
+  group_by(id) %>% 
+  mutate(plot_id = as.integer(as.factor(plot_id)))
 
-
-# ..........................................
-# ..........................................
+# .......................................
+# .......................................
 # Check agronomic data ####
 
 # add plot size
 df %<>% 
-  mutate(plot_size = ifelse(year == 2013, 0.4, 
+  mutate(gy_gm = as.numeric(gy_gm),
+         biomass_gm = as.numeric(biomass_gm),
+         mean_seed_no_spike = as.numeric(mean_seed_no_spike),
+         mean_tn = as.numeric(mean_tn),
+         mean_sl = as.numeric(mean_sl),
+         plot_size = ifelse(year == 2013, 0.4, 
                             ifelse(year == 2014, 1.6,
                                    ifelse(year == 2015, 1.2, NA))),
          gy_gm = gy_gm / plot_size)
@@ -354,21 +355,19 @@ df <- y
 
 boxplot(df$gy_gm ~ df$accession, las = 2)
 
-# id into integers
-df %<>% 
-  mutate(plot_id = as.integer(as.factor(id)),
-         id = as.integer(as.factor(farmer)))
-
-
 names(df)
 # organize colunm order
-first <- c("id","genotype","accession","plot_no","plot_id","farmer_no")
+first <- c("id","genotype","accession","plot_id","farmer")
 
 df <- df[c(match(first, names(df)),
            which(!names(df) %in% first))] 
 
 df %<>% 
   arrange(id)
+
+drop <- c("zone","seedwt_500","biomass_gm","reseason_rank")
+
+df <- df[, !names(df) %in% drop]
 
 write_csv(df, "data/durumwheat.csv")
 
