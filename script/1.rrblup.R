@@ -65,14 +65,10 @@ csdata<-read.csv(text=url)
 rownames(csdata)<-csdata[,1]
 csdata<-csdata[,-1]
 
-#make sure that the data is normal!!!
-shapiro.test(csdata[,1])
-shapiro.test(csdata[,2])
-
 #add data produced locally
 load("../0.get.data/rough.cs.data.estimates.Rdata")
 #make it normally distributed
-outrough<-apply(outrough,2,log)
+#outrough<-apply(outrough,2,sqrt)
 joined.csdata<-merge(csdata, outrough, by="row.names")
 row.names(joined.csdata)<-joined.csdata[,1]
 joined.csdata<-joined.csdata[,-1]
@@ -115,8 +111,8 @@ load("GP.data.step1.Rdata")
 
 ########  PERFORM GP  ########
 #run GBLUP to perform genomic prediction
-fraction<-.5
-nruns<-100
+fraction<-.7
+nruns<-50
 tsize<-floor(length(csids)*fraction)
 
 #generate samples
@@ -138,7 +134,7 @@ for (zz in 1:length(samps)){
   traingeno<-setdiff(rownames(imputedcl), testgeno)
 
   #set training phenos and test phenos
-  traintrait<-colnames(phenos)[grep("GY.201[23]$|SPIKE..2012$|OVERALL..2012$", colnames(phenos))]
+  traintrait<-colnames(phenos)[grep("GY.201[23]$|SPIKE..201[23]$SPIKE..2012$|OVERALL..2012$", colnames(phenos))]
   testtrait<-colnames(phenos)[97:ncol(phenos)]
   
   tpheno<-phenos[rownames(phenos) %in% traingeno,traintrait]
@@ -172,6 +168,7 @@ for (zz in 1:length(samps)){
     traitout[[p]]<-accuracy
     names(traitout[[p]])<-curp
   }
+  
   traitoutdf<-do.call(cbind, traitout)
   colnames(traitoutdf)<-colnames(tpheno)
   predresults[[zz]]<-traitoutdf
