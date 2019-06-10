@@ -16,7 +16,6 @@ df <- "data/durumwheat.csv"
 df %<>% 
   read_csv()
 
-
 output <- "output/log-abilities/"
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 
@@ -54,7 +53,7 @@ winprobs <- bind_cols(genotype = names(winprobs),
 B <- rank_binomial(R, drop.null = TRUE)
 
 mod <- BTm(cbind(win1, win2), player1, player2, ~ genotype,
-           id = "genotype", data = B, ref = "435ET_D")
+           id = "genotype", data = B)
 
 
 summary(mod)
@@ -69,6 +68,11 @@ x <- tibble(genotype = names(x),
 winprobs %<>% 
   merge(. , x, by = "genotype", all.x = TRUE) %>% 
   as_tibble()
+
+winprobs %<>% 
+  mutate(pow_rank_bt = ifelse(is.na(pow_rank_bt),
+                              0,
+                              pow_rank_bt))
 
 
 #...........................
@@ -123,7 +127,38 @@ winprobs %<>%
   as_tibble()
 
 
-write_csv(winprobs, paste0(output, "probability_of_winning.csv"))
+#.....................................
+#.....................................
+# farmer rank BradleyTerry ####
+
+# get a binomial rank
+B <- rank_binomial(YR, drop.null = TRUE)
+
+mod <- BTm(cbind(win1, win2), player1, player2, ~ genotype,
+           id = "genotype", data = B)
+
+
+summary(mod)
+
+x <- coef(mod)
+
+names(x) <- gsub("genotype","",names(x))
+
+x <- tibble(genotype = names(x),
+            pow_gy_bt = x)
+
+winprobs %<>% 
+  merge(. , x, by = "genotype", all.x = TRUE) %>% 
+  as_tibble()
+
+winprobs %<>% 
+  mutate(pow_gy_bt = ifelse(is.na(pow_gy_bt),
+                            0,
+                            pow_gy_bt))
+
+
+write_csv(winprobs, paste0(output, "log-abilities.csv"))
+
 
 
 # ...................................

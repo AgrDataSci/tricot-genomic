@@ -1114,7 +1114,6 @@ id,genotype,accession,plot_id,farmer,year,region,district,kebele,lat,lon,plot_no
 571,341ET_D,asassa,2,Getachewu Asefa,2014,Amhara,Meket,Agrit,11.81709,38.67111739,4,NA,NA,NA,2.6,36.2,6.4,81.25,1,2014-08-02,130,1.6
 573,249ET_D,210820a,1,Getahun Teketay,2014,Amhara,Meket,Timtimat,11.718192,38.961236,3,NA,NA,NA,2.6,38.6,8.2,99.375,3,2014-08-02,159,1.6
 573,415ET_D,222854,3,Getahun Teketay,2014,Amhara,Meket,Timtimat,11.718192,38.961236,1,NA,NA,NA,4,33.2,6.4,NA,4,2014-08-02,NA,1.6
-573,435ET_D,238516,4,Getahun Teketay,2014,Amhara,Meket,Timtimat,11.718192,38.961236,2,NA,NA,NA,4.6,30,6.2,137.5,1,2014-08-02,220,1.6
 573,341ET_D,asassa,2,Getahun Teketay,2014,Amhara,Meket,Timtimat,11.718192,38.961236,4,NA,NA,NA,3.8,27.4,6,148.125,2,2014-08-02,237,1.6
 576,019ET_D,204488,1,Getaye Alemu,2014,Amhara,Meket,Timtimat,11.718192,38.961236,2,NA,NA,NA,1.6,NA,7,NA,1,2014-08-02,NA,1.6
 576,167ET_D,236269,2,Getaye Alemu,2014,Amhara,Meket,Timtimat,11.718192,38.961236,3,NA,NA,NA,2.6,NA,4.8,NA,3,2014-08-02,NA,1.6
