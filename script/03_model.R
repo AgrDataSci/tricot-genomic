@@ -1,49 +1,74 @@
+# Get log abilities from PlackettLuce and Bradley-Terry models 
+# as a proxy for genomic prediction
+
 library("tidyverse")
 library("magrittr")
 library("gosset")
 library("PlackettLuce")
+library("BradleyTerry2")
+library("svglite")
 
+#.....................................
+#.....................................
+# Read data ####
 
 df <- "data/durumwheat.csv"
 df %<>% 
   read_csv()
 
 
-output <- "output/exploring/"
+output <- "output/log-abilities/"
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 
 #.....................................
 #.....................................
 # farmer rank ####
 
-# create grouped rankings 
-G <- to_rankings(data = df,
+# create PlackettLuce rankings 
+R <- to_rankings(data = df,
                  items = "genotype",
                  input = "farmer_rank",
-                 id = "id", 
-                 grouped.rankings = TRUE)
+                 id = "id")
 
-# add explanatory vars
-# to_rankings internaly order the rankings by their id 
-# so I will keep the unique values by id and combine with the 
-# grouped_rankings
+mod <- PlackettLuce(R)
 
-df %>% 
-  arrange(id) %>% 
-  distinct(id, .keep_all = TRUE) %>% 
-  select(year, region) -> 
-  expvar
+svg(filename = paste0(output, "coeff_farmer_rank_PL.svg"),
+    width = 10,
+    height = 6.5,
+    pointsize = 12)
+plot(qvcalc(itempar(mod, log = TRUE)), las = 2)
+dev.off()
 
-G <- cbind(G, expvar)
-
-mod <- pltree(G ~ ., data = G)
-
-plot(mod)
 
 winprobs <- itempar(mod, log = TRUE)
 
-winprobs <- bind_cols(genotype = dimnames(winprobs)[[2]],
+winprobs <- bind_cols(genotype = names(winprobs),
                       pow_rank = as.vector(winprobs))
+
+
+#.....................................
+#.....................................
+# farmer rank BradleyTerry ####
+
+# get a binomial rank
+B <- rank_binomial(R, drop.null = TRUE)
+
+mod <- BTm(cbind(win1, win2), player1, player2, ~ genotype,
+           id = "genotype", data = B, ref = "435ET_D")
+
+
+summary(mod)
+
+x <- coef(mod)
+
+names(x) <- gsub("genotype","",names(x))
+
+x <- tibble(genotype = names(x),
+            pow_rank_bt = x)
+
+winprobs %<>% 
+  merge(. , x, by = "genotype", all.x = TRUE) %>% 
+  as_tibble()
 
 
 #...........................
@@ -70,19 +95,27 @@ id <- gy$id %in% keep$id
 gy <- gy[id,]
 
 
+# grain yield into rankings
 YR <- to_rankings(data = gy,
                   items = "genotype",
                   input = "gy_gm",
-                  id = "id", 
-                  grouped.rankings = TRUE)
+                  id = "id")
 
 
-mod_gy <- pltree(YR ~ 1, data = YR)
+mod_gy <- PlackettLuce(YR)
+
+
+svg(filename = paste0(output, "coeff_grainyield_rank_PL.svg"),
+    width = 10,
+    height = 6.5,
+    pointsize = 12)
+plot(qvcalc(itempar(mod_gy, log = TRUE)), las = 2)
+dev.off()
 
 
 winprobs_gy <- itempar(mod_gy, log = TRUE)
 
-winprobs_gy <- bind_cols(genotype = dimnames(winprobs_gy)[[2]],
+winprobs_gy <- bind_cols(genotype = names(winprobs_gy),
                          pow_gy = as.vector(winprobs_gy))
 
 winprobs %<>% 

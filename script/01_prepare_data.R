@@ -191,6 +191,7 @@ summary(as.factor(df$planting_date))
 
 
 varing <- sort(unique(df$year))
+
 # fill missing planting dates with average per year
 for(i in seq_along(varing)){
   y_i <- varing[i]
@@ -274,6 +275,24 @@ df %<>%
   distinct(genotype, .keep_all = TRUE) %>% 
   distinct(farmer_rank, .keep_all = TRUE) %>% 
   as_tibble()
+
+
+# remove those tested in less than 10 farms 
+df %>% 
+  group_by(accession) %>%  
+  count(accession) %>%
+  filter(n < 10) %>%
+  select(accession) %>%
+  t() %>%
+  as.vector() ->
+  drop
+
+
+drop <- !df$accession %in% drop
+
+df %<>% 
+  filter(drop)
+
 
 # only keep strict rankings of at least 2 distinct items
 df %>%
