@@ -299,16 +299,21 @@ df %<>%
 # .......................................
 # Check agronomic data ####
 
-# add plot size
+# set as numeric
 df %<>% 
   mutate(gy_gm = as.numeric(gy_gm),
          biomass_gm = as.numeric(biomass_gm),
          mean_seed_no_spike = as.numeric(mean_seed_no_spike),
          mean_tn = as.numeric(mean_tn),
-         mean_sl = as.numeric(mean_sl),
-         plot_size = ifelse(year == 2013, 0.4, 
-                            ifelse(year == 2014, 1.6,
-                                   ifelse(year == 2015, 1.2, NA))),
+         mean_sl = as.numeric(mean_sl))
+
+# normalise by plot size
+df %<>% 
+  mutate(gy_gm_raw = gy_gm,
+         plot_size = ifelse(year == 2013 & region == "Tigray", 1.6,
+                            ifelse(year == 2013 & region != "Tigray", 0.4,
+                                   ifelse(year == 2014, 1.6,
+                                          ifelse(year == 2015, 1.2, NA)))),
          gy_gm = gy_gm / plot_size)
 
 # mean tiller number
