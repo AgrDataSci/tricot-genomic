@@ -1,6 +1,6 @@
 ####################################################
 ###### Read and clean durum wheat in Ethiopia
-# Updated 09un2019
+# Updated 11Jun2019
 ####################################################
 
 library("tidyverse")
@@ -149,84 +149,8 @@ plot(eth["GID_0"], col = "lightgrey", reset = FALSE)
 plot(lonlat, col = "blue", cex = 1,
      bg = "Steelblue1", pch = 21, add = TRUE)
 
-
-# .......................................
-# .......................................
-# Fix planting dates ####
-# planting dates 
-
-df %>% 
-  select(sowing_date) %>% 
-  mutate(sowing_date = as.character(sowing_date)) ->
-  date
-
-date %<>% 
-  mutate(sowing_date = gsub("[/]|[.]","-", sowing_date)) %>% 
-  separate(., sowing_date, into = c("x","y","z"), sep = "-") %>% 
-  mutate_all(as.integer)
-
-summary(as.factor(date$x))
-summary(as.factor(date$y))
-summary(as.factor(date$z))
-
-# planting dates must be between month 7 and 8
-date %<>% 
-  mutate(y = ifelse(y < 7 , 8, y),
-         y = ifelse(y > 8, 8, y))
-
-summary(as.factor(date$x))
-summary(as.factor(date$y))
-summary(as.factor(date$z))
-
-date %<>% 
-  mutate(planting_date = ifelse(x > 2000, paste(x, y, z, sep = "-"),
-                              ifelse(z > 2000, paste(z, y, x, sep = "-"), NA)))
-
-df %<>% 
-  mutate(planting_date = date$planting_date,
-         planting_date = as.Date(planting_date, format = "%Y-%m-%d"), 
-         planting_date = as.integer(planting_date))
-
-summary(as.factor(df$planting_date))
-
-
-varing <- sort(unique(df$year))
-
-# fill missing planting dates with average per year
-for(i in seq_along(varing)){
-  y_i <- varing[i]
-  # check which value is the closest to the mean
-  # and get the centroid
-  df %>% 
-    filter(year == y_i) %>% 
-    filter(!is.na(planting_date)) ->
-    x
-  
-  z <- mean(x$planting_date)
-  z <- unlist(x[, "planting_date"] - z)
-  z <- x[[which.min(abs(z)), "planting_date"]]
-  
-  df %<>% 
-    mutate(planting_date = ifelse(is.na(planting_date) & year == y_i,
-                                  z,
-                                  planting_date))
-  
-}
-
-rm(x)
-
-df %<>% 
-  mutate(planting_date = as.Date(planting_date, origin = "1970-01-01"),
-         year = as.integer(strftime(planting_date, "%Y"))) %>% 
-  select(-sowing_date)
-
-sum(is.na(df$planting_date))
-
-plot(df$planting_date)
-
-
-# .......................................
-# .......................................
+#.........................................
+#.........................................
 # Keep consistent observations #### 
 
 out <- "data/raw/not_in_genotyping.csv"
@@ -312,7 +236,92 @@ df <- df[id,]
 
 df %<>% 
   group_by(id) %>% 
-  mutate(plot_id = as.integer(as.factor(plot_id)))
+  mutate(plot_id = as.integer(as.factor(plot_id))) %>% 
+  as_tibble()
+
+# .......................................
+# .......................................
+# Fix planting dates ####
+# planting dates 
+
+df %>% 
+  select(sowing_date) %>% 
+  mutate(sowing_date = as.character(sowing_date)) ->
+  date
+
+date %<>% 
+  mutate(sowing_date = gsub("[/]|[.]","-", sowing_date)) %>% 
+  separate(., sowing_date, into = c("x","y","z"), sep = "-") %>% 
+  mutate_all(as.integer)
+
+summary(as.factor(date$x))
+summary(as.factor(date$y))
+summary(as.factor(date$z))
+
+# planting dates must be between month 7 and 8
+date %<>% 
+  mutate(y = ifelse(y < 7 , 8, y),
+         y = ifelse(y > 8, 8, y))
+
+summary(as.factor(date$x))
+summary(as.factor(date$y))
+summary(as.factor(date$z))
+
+date %<>% 
+  mutate(planting_date = ifelse(x > 2000, paste(x, y, z, sep = "-"),
+                                ifelse(z > 2000, paste(z, y, x, sep = "-"), NA)))
+
+df %<>% 
+  mutate(planting_date = date$planting_date,
+         planting_date = as.Date(planting_date, format = "%Y-%m-%d"), 
+         planting_date = as.integer(planting_date))
+
+summary(as.factor(df$planting_date))
+
+
+# fill missing planting dates with average per kebele and year
+df %<>% 
+  mutate(varing = ifelse(year == 2013, -365, 
+                         ifelse(year == 2015, 365, 0)))
+
+
+df %>% 
+  select(planting_date, year) %>% 
+  filter(!is.na(planting_date), year == 2014) %>% 
+  summarise(mean =  mean(planting_date),
+            min = min(planting_date),
+            max = max(planting_date),
+            median = median(planting_date)) ->
+  varing
+
+
+as.integer(rnorm(1, mean = varing$mean, sd = 10), origin = "1970-01-01")
+
+df_split <- split(df, df$id)
+
+df_split <- lapply(df_split, function(X) {
+  i <- as.integer(rnorm(1, mean = varing$mean, sd = 10), origin = "1970-01-01")
+  i <- i + unique(X$varing)
+  
+  X$planting_date <- ifelse(is.na(X$planting_date), 
+                            i, X$planting_date)
+  
+  X
+})
+
+
+df <- bind_rows(df_split)
+
+
+df %<>% 
+  mutate(planting_date = as.Date(planting_date, origin = "1970-01-01"),
+         year = as.integer(strftime(planting_date, "%Y"))) %>% 
+  select(-sowing_date, -varing)
+
+sum(is.na(df$planting_date))
+
+plot(df$planting_date)
+
 
 # .......................................
 # .......................................
