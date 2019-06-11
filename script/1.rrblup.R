@@ -8,12 +8,12 @@ library(reshape2)
 library(plyr)
 library(RCurl)
 
-wd<-"C:/Users/admin/OneDrive - Scuola Superiore Sant'Anna/projects/tricot.genomics/analyses/1.rrBLUP"
-setwd(wd)
+#wd<-"C:/Users/admin/OneDrive - Scuola Superiore Sant'Anna/projects/tricot.genomics/analyses/1.rrBLUP"
+#setwd(wd)
 
 ########  SNP DATA  ########
 #get in genotypes and clean them
-hmp<-read.delim("../../data/diversity.panel.svevo.positions.q10.hmp")
+hmp<-read.delim("data/diversity.panel.svevo.positions.q10.hmp")
 snp.pos<-hmp[,1:11]
 geno<-hmp[,12:ncol(hmp)]
 rownames(geno)<-hmp[,1]
@@ -54,13 +54,13 @@ rownames(imputedcl)<-colnames(geno)
 
 ########  PHENOTYPIC DATA  ########
 #get in BLUP values and clean them
-phenos<-read.csv("../../data/Et_diversity_panel_ALL-TRAITS.BLUPS.csv")
+phenos<-read.csv("data/Et_diversity_panel_ALL-TRAITS.BLUPS.csv")
 phenos<-phenos[!is.na(phenos[,3]),]
 rownames(phenos)<-phenos[,3]
 phenos<-phenos[,6:ncol(phenos)]
 
 #load in the crowdsourcing data produced by Kaue
-url<-getURL("https://raw.githubusercontent.com/agrobioinfoservices/tricot-genomic/master/output/exploring/probability_of_winning.csv")
+url<-getURL("https://raw.githubusercontent.com/agrobioinfoservices/tricot-genomic/master/output/log-abilities/log-abilities.csv")
 csdata<-read.csv(text=url)
 rownames(csdata)<-csdata[,1]
 csdata<-csdata[,-1]
