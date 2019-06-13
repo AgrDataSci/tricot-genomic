@@ -9,15 +9,15 @@ output:
 ---
 
 
-Kauê de Sousa^1,2,^*, Matteo Dell’Acqua^3^, Jacob van Etten^2^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Basazen Fantahun Lakew^3^, Dejene Mengistu^7^, Mario Enrico Pè^3^, [… add others], Svein Ø. Solberg^1^  
-^1^ Department of Agricultural Sciences, Inland Norway University of Applied Sciences, 2318 Hamar, Norway  
-^2^ Bioversity International, Costa Rica Office, 30501 Turrialba, Costa Rica   
-^3^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  
-^4^ Bioversity International, Ethiopia Office, 1000 Addis Ababa, Ethiopia  
-^5^ College of Agriculture and Life Sciences, Cornell University, 14853 Ithaca, USA  
-^6^ Agricultural Research Service, United States Department of Agriculture, 148532901, Ithaca, USA  
-^7^ Bioversity International, Nepal Office, 3055 Kathmandu, Nepal  
-
+Kauê de Sousa^1,2^, Jacob van Etten^2^, Carlo Fadda^3^, Yosef Gebrehawaryat^3^, Jean-Luc Jannink^4,5^, Basazen Fantahun Lakew^6^, Dejene Mengistu^7^, Svein Ø. Solberg^1^, Mario Enrico Pè^6^, Jesse Poland^8^, [… add others], Melfa and Workaye Farmer Community, Matteo Dell’Acqua^6[*]^  
+^1^ Department of Agricultural Sciences, Inland Norway University of Applied Sciences, 2318 Hamar, Norway ^2^ Bioversity International, Costa Rica Office, 30501 Turrialba, Costa Rica   
+^3^ Bioversity International, Ethiopia Office, 1000 Addis Ababa, Ethiopia  
+^4^ College of Agriculture and Life Sciences, Cornell University, 14853 Ithaca, USA  
+^5^ Agricultural Research Service, United States Department of Agriculture, 148532901, Ithaca, USA  
+^6^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  
+^7^ Bioversity International, Nepal Office, 3055 Kathmandu, Nepal 
+^8^ Kansas State University, Kansas, USA
+^[*]^To whom correspondence must be addressed <m.dellacqua@santannapisa.it>
 
 
 **Research questions:**  

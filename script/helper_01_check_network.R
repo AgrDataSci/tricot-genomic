@@ -10,6 +10,9 @@ df <- "data/durumwheat.csv"
 df %<>%
   read_csv()
 
+
+table(df$accession, df$region)
+
 R <- to_rankings(data = df,
                  items = "genotype",
                  input = "farmer_rank",
