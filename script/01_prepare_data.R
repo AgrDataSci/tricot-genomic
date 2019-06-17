@@ -55,8 +55,9 @@ df %<>%
          lat = ifelse(is.na(lon), NA, lat))
 
 # Download country border of ethiopia
+eth <-
 raster::getData("GADM", country = "ETH", path = "data", level = 0) %>% 
-  st_as_sf() -> eth
+  st_as_sf()
 
 # plot(eth["GID_0"], col = "lightgrey")
 # 
