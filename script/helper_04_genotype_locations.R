@@ -17,8 +17,11 @@ eth <-
   st_as_sf()
 
 pass %>%
-  select(lon, lat) %>%
-  filter(!is.na(lon)) %>%
+  dplyr::select(lon, lat) %>%
+  filter(!is.na(lon)) ->
+  xy
+  
+xy %>% 
   as.matrix() %>%
   st_multipoint() %>%
   st_sfc(crs = st_crs(eth)) ->
@@ -27,3 +30,5 @@ pass %>%
 plot(eth["GID_1"], col = "#F2F2F2", reset = FALSE)
 plot(lonlat, col = "blue", cex = 1,
      bg = "Steelblue1", pch = 21, add = TRUE)
+
+
