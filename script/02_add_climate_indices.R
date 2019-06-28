@@ -28,8 +28,8 @@ df
 # Average dates for booting, flowering and maturity
 # c(60,75,135)
 spans <- as.matrix(cbind(period = c("veg", "rep", "gra", "sow2rep", "sow2gra"),
-                   ts = c(60, 30, 45, 90, 135),
-                   sumtosow = c(0, 60, 90, 0, 0)))
+                   ts = c(65, 30, 45, 95, 140),
+                   sumtosow = c(0, 65, 95, 0, 0)))
 
 
 # ............................................
@@ -74,8 +74,8 @@ temp
 # combine temperature and rainfall indices
 indices <- bind_cols(rain, temp)
 
-indices
-
+indices %<>% 
+  mutate(year = df$year)
 
 # remove variables with low variance
 out <- nearZeroVar(indices)

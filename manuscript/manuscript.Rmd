@@ -9,34 +9,38 @@ output:
 ---
 
 
-Kauê de Sousa^1,2^, Jacob van Etten^2^, Carlo Fadda^3^, Yosef Gebrehawaryat^3^, Jean-Luc Jannink^4,5^, Basazen Fantahun Lakew^6^, Dejene Mengistu^7^, Svein Ø. Solberg^1^, Mario Enrico Pè^6^, Jesse Poland^8^, [… add others], Melfa and Workaye Farmer Community, Matteo Dell’Acqua^6[*]^  
+Kauê de Sousa^1,2^, Jacob van Etten^2^, Svein Ø. Solberg^1^, Mario Enrico Pè^3^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Basazen Fantahun Lakew^3^, Dejene Mengistu^7^,  Jesse Poland^8^, [… add others], Matteo Dell’Acqua^3[*]^  
 ^1^ Department of Agricultural Sciences, Inland Norway University of Applied Sciences, 2318 Hamar, Norway  
 ^2^ Bioversity International, Costa Rica Office, 30501 Turrialba, Costa Rica   
-^3^ Bioversity International, Ethiopia Office, 1000 Addis Ababa, Ethiopia  
-^4^ College of Agriculture and Life Sciences, Cornell University, 14853 Ithaca, USA  
-^5^ Agricultural Research Service, United States Department of Agriculture, 148532901, Ithaca, USA  
-^6^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  
+^3^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  
+^4^ Bioversity International, Ethiopia Office, 1000 Addis Ababa, Ethiopia  
+^5^ College of Agriculture and Life Sciences, Cornell University, 14853 Ithaca, USA  
+^6^ Agricultural Research Service, United States Department of Agriculture, 148532901, Ithaca, USA  
 ^7^ Bioversity International, Nepal Office, 3055 Kathmandu, Nepal  
 ^8^ Kansas State University, Kansas, USA  
 ^[*]^Correspondence should be addressed to MDA (email: <m.dellacqua@santannapisa.it>)
 
 
-**Research questions:**  
-
-* Can farmers' evaluations better predict varietal performance associated with genes?
-* Can we use crowdsourcing to improve GxE estimates?
-* What is the ability of local varieties to outperform varieties from other zones?
+# Research questions:
 
 
-# Introduction
-
-* Crowdsourcing citizen science showed the ability to register the climate effects as they occur in farms, with potential to be used in plant breeding programs and risk assessments for farm adaptation[@VanEtten2019].
+* Does farmers' evaluations associated with genes provide better predictions on varietal performance then station-only data?
+* Does farmer's crowdsourced evaluations associated to SNP markers improve GxE estimates?
+* Can we bring a new breeding paradigm where farmers actively participate in plant selection?
 
 
 # Methods  
 
-## Model approaches
+## Genomic prediction
 
+Methods from RBlup to genomic prediction with SNP markers. Farmers' evaluation from citizen science trials are connect to this approach by adding the probability of winning from Plackett-Luce as explanatory variables. 
+
+Other explanatory variables include the metric traits from station experiments.
+
+
+## GxE interactions
+
+Split varieties from citizen science trails by groups from their origin (cold tolerants and low regions). This cal also be used in the genomic prediction.
 
 Run a number of scenarios from varieties selection using the citizen science and station data to determine whether the genetic information provides any gain or not
 
@@ -58,13 +62,12 @@ Predict rating data with an appropriate GLM model for ordinal data (the rates sh
 Improvement: same farmer preferences + genomic data, letting the ordering be influenced by genomic relatedness
 The exercise could use rank correlation, Kendall´s tau as criterion, but could also make a real “selection” (say top 50%) of the accessions and determine the gain as the % that indeed falls in the top 50% in the tricot trial. A p value for this exercise could be determined by doing 10,000 random selections of 50% to get a null distribution.
 
-# Results  
+# Topics for discussion (or keep in mind)
 
-# Discussion 
-
-* What is the relative costs of these approaches
+* GxE driven by under-representative samples or farm management.
 * Is data missingness non-random? Can data missingness be predicted from farmer preferences? 
 * Can we say something about which genomic regions play a role?
+
 
 # References
 
