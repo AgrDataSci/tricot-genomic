@@ -1,23 +1,21 @@
 ---
-title: "Combining genomic prediction with citizen science for crop improvement and early selection in durum wheat"
+title: "Genomic prediction associated with citizen science for early selection and improvement in durum wheat"
 bibliography: "library/tricotgenomic.bib"
 csl: "library/citation-style.csl"
 output: 
   word_document:
     reference_docx: "library/word-styles-reference-01.docx"
-# output: pdf_document
 ---
 
-
-Kauê de Sousa^1,2^, Jacob van Etten^2^, Svein Ø. Solberg^1^, Mario Enrico Pè^3^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Basazen Fantahun Lakew^3^, Dejene Mengistu^7^,  Jesse Poland^8^, [… add others], Matteo Dell’Acqua^3[*]^  
+Kauê de Sousa^1,2^, Jacob van Etten^2^, Svein Ø. Solberg^1^, Mario Enrico Pè^3^, Carlo Fadda^4^, Yosef Gebrehawaryat^4^, Jean-Luc Jannink^5,6^, Basazen Fantahun Lakew^3^, Dejene Mengistu^7^, Jesse Poland^8^, [… add others], Matteo Dell’Acqua^3[*]^  
 ^1^ Department of Agricultural Sciences, Inland Norway University of Applied Sciences, 2318 Hamar, Norway  
 ^2^ Bioversity International, Costa Rica Office, 30501 Turrialba, Costa Rica   
-^3^ Scuola Superiore Sant’Anna, Institute of Life Sciences, 56124 Pisa, Italy  
+^3^ Institute of Life Sciences, Scuola Superiore Sant’Anna, 56124 Pisa, Italy  
 ^4^ Bioversity International, Ethiopia Office, 1000 Addis Ababa, Ethiopia  
-^5^ College of Agriculture and Life Sciences, Cornell University, 14853 Ithaca, USA  
-^6^ Agricultural Research Service, United States Department of Agriculture, 148532901, Ithaca, USA  
+^5^ College of Agriculture and Life Sciences, Cornell University, NY 14853 Ithaca, USA  
+^6^ Agricultural Research Service, United States Department of Agriculture, NY 14853 Ithaca, USA  
 ^7^ Bioversity International, Nepal Office, 3055 Kathmandu, Nepal  
-^8^ Kansas State University, Kansas, USA  
+^8^ Department of Agronomy, Kansas State University, KS 66506 Manhattan, USA  
 ^[*]^Correspondence should be addressed to MDA (email: <m.dellacqua@santannapisa.it>)
 
 
@@ -25,24 +23,21 @@ Kauê de Sousa^1,2^, Jacob van Etten^2^, Svein Ø. Solberg^1^, Mario Enrico Pè^
 
 
 * Does farmers' evaluations associated with genes provide better predictions on varietal performance then station-only data?
-* Does farmer's crowdsourced evaluations associated to SNP markers improve GxE estimates?
-* Can we bring a new breeding paradigm where farmers actively participate in plant selection?
-
+* Can the GxE estimates be improved by farmers' evaluations associated to SNP markers?
+* Can the combination of genomic and citizen science provide new insights in which traits farmers prioritise or which areas of the genome play a role?
 
 # Methods  
 
 ## Genomic prediction
 
-Methods from RBlup to genomic prediction with SNP markers. Farmers' evaluation from citizen science trials are connect to this approach by adding the probability of winning from Plackett-Luce as explanatory variables. 
-
-Other explanatory variables include the metric traits from station experiments.
+RBlup to genomic prediction with SNP markers. Farmers' evaluation from citizen science trials are connected to this approach by adding the probability of winning from Plackett-Luce as explanatory variables. Other explanatory variables include the metric traits from station experiments.
 
 
 ## GxE interactions
 
-Split varieties from citizen science trails by groups from their origin (cold tolerants and low regions). This cal also be used in the genomic prediction.
+Split varieties from citizen science trails by groups from their origin (cold tolerants vs others). This can also be used in the genomic prediction.
 
-Run a number of scenarios from varieties selection using the citizen science and station data to determine whether the genetic information provides any gain or not
+Run a number of scenarios from varieties selection using the citizen science and station data to determine whether the genetic information provides any gain or not.
 
 **Scenario 1**  
 
