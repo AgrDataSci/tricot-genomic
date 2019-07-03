@@ -21,6 +21,8 @@ R <- to_rankings(data = df,
 
 adj <- adjacency(R)
 
+connectivity(adj)
+
 adj <- as.vector(adj)
 
 adj <- t(matrix(adj, nrow = ncol(R), ncol = ncol(R)))

@@ -7,6 +7,7 @@ library("foreach")
 library("doParallel")
 library("abind")
 
+source("script/helper_07_forward.R")
 
 #...................................
 #...................................
@@ -37,6 +38,8 @@ G <- to_rankings(data = df,
                  grouped.rankings = TRUE)
 
 
+P <- to_paircomp(G)
+
 mod <- PlackettLuce(G)
 
 # normal prior object from additive matrix
@@ -47,30 +50,32 @@ prior <- list(mu = as.vector(coef(mod)),
 #.................................................
 #.................................................
 # Set parameters for forward selection ####
+out <- !grepl("Rx1day|Rx5day|SU|Rtotal|SDII", names(ind))
+ind <- ind[out]
 
-data <- cbind(G, ind[50:65])
+data <- cbind(P, ind[-ncol(ind)])
 
-# add a empty variable to the model 
-data$empty_model <- 1
-
+# cross-validation parameters
 folds <- as.integer(as.factor(ind$year))
-
 k <- max(folds)
 
-vars <- names(data)[2:ncol(data)]
-
+# PlackettLuce parameters
 minsize <- round((nrow(data)*0.15), -1)
-
-bonferroni <- TRUE
-
+bonferroni <- FALSE
 alpha <- 0.05
+normal <- prior
+npseudo <- 0.5
 
-ncores <- 2
-
-# a list to keep the parameters from each step 
+# forward selection parameters 
+data$empty_model <- 1
+vars <- names(data)[2:ncol(data)]
+var_keep <- character()
 coeffs <- list()
+counter <- 1
+best <- TRUE
 
-# create cluster to do parallelisation
+# parallelisation parameters
+ncores <- 2
 cluster <- parallel::makeCluster(ncores)
 doParallel::registerDoParallel(cluster)
 
@@ -79,30 +84,29 @@ while (best) {
   
   cat("\nForward Selection. Step ", counter, "\n Time: ", date(), "\n")
   
-  fs <- length(exp_var)
+  fs <- length(vars)
   
   args <- list(data = data, 
                k = k, 
-               folds = folds)
-  
-  args <- c(args, dots)
+               folds = folds, 
+               alpha = alpha,
+               minsize = minsize)
   
   i <- 1:fs
   
   # get predictions from nodes and put in matrix
-  models <- try(foreach::foreach(i = i,
-                                 .combine = .comb,
-                                 .packages = packages) %dopar% (.forward_dopar(as.formula(
-                                   paste0(Y, " ~ ", paste(c(var_keep, exp_var[i]), collapse = " + "))
+  models <- foreach::foreach(i = i,
+                             .combine = .comb) %dopar% (.forward_dopar(as.formula(
+                               paste0("P ~ ", paste(c(var_keep, vars[i]), collapse = " + "))
                                  ),
-                                 args)))
+                                 args))
   
   dimnames(models) <- list(1:fs,
                            paste0("bin",1:k), 
-                           opt.select)
+                           c("AIC","deviance","logLik","MaxLik","CraggUhler", "Agresti"))
   
   # take the matrix with selected goodness of fit
-  modpar <- models[, , dimnames(models)[[3]] %in% select.by]
+  modpar <- models[, , dimnames(models)[[3]] %in% "deviance"]
   
   if(is.null(dim(modpar))) {
     modpar <- t(as.matrix(modpar))

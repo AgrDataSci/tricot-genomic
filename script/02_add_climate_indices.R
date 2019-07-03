@@ -78,7 +78,7 @@ indices %<>%
   mutate(year = df$year)
 
 # remove variables with low variance
-out <- nearZeroVar(indices)
+out <- nearZeroVar(indices, freqCut = 95/50, uniqueCut = 50)
 
 names(indices)[out]
 
