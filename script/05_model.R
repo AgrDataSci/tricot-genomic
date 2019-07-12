@@ -19,6 +19,7 @@ df <- "data/durumwheat.csv"
 df %<>% 
   read_csv()
 
+
 # additive matrix from genes
 load("data/additive.matrix.cs.rda")
 
@@ -30,21 +31,55 @@ ind %<>%
 
 #.....................................
 #.....................................
-# create PlackettLuce rankings 
+# create PlackettLuce rankings ####
+# remove NAs in grain yield
+df %>% 
+  filter(!is.na(gy_gm)) -> 
+  gy
+
+# only keep strict rankings of at least 2 distinct items
+gy %>%
+  group_by(id) %>%
+  summarise(keep = length(id)) %>%
+  mutate(keep = keep > 1) %>% 
+  filter(keep) ->
+  keep
+
+# apply the logical vector
+id <- gy$id %in% keep$id
+
+# keep selected observations
+df <- gy[id,]
+
+id <- ind$id %in% keep$id
+
+ind <- ind[id, ]
+
 G <- to_rankings(data = df,
                  items = "genotype",
-                 input = "farmer_rank",
+                 input = "gy_gm",
                  id = "id", 
                  grouped.rankings = TRUE)
 
-
 P <- to_paircomp(G)
+
+w <- G[1:length(G) , , as.grouped_rankings = FALSE]
+w[w==0] <- NA
+w <- apply(w, 1, function(x) sum(!is.na(x)))
+w <- 1 + (w * 0.1)
+
 
 mod <- PlackettLuce(G)
 
 # normal prior object from additive matrix
-prior <- list(mu = as.vector(coef(mod)),
+prior <- list(mu = coef(mod),
               Sigma = additivemat)
+
+
+# mod2 <- PlackettLuce(G, normal = prior, gamma = TRUE)
+# 
+# AIC(mod)
+# AIC(mod2)
 
 
 #.................................................
@@ -53,22 +88,89 @@ prior <- list(mu = as.vector(coef(mod)),
 out <- !grepl("Rx1day|Rx5day|SU|Rtotal|SDII", names(ind))
 ind <- ind[out]
 
-data <- cbind(P, ind[-ncol(ind)])
+data <- cbind(G, empty_model = 0, ind[-ncol(ind)])
+
+n <- nrow(data)
+
+# names(data)
+# 
+# head(data)
+# 
+# 
+# null <- pltree(G ~ empty_model,
+#                data = data, 
+#                weights = w)
+# 
+# AIC(null)
+# 
+# 
+# tree <- pltree(G ~ minNT_rep + minNT_sow2rep + minNT_sow2gra, 
+#                data = data, 
+#                weights = w,
+#                normal = prior, 
+#                gamma = TRUE,
+#                bonferroni = TRUE)
+# 
+# tree
+# 
+# AIC(null)
+# AIC(tree)
+# 
+# pseudoR2(null, newdata = data)
+# 
+# pseudoR2(tree, newdata = data)
+# 
+# logLik(tree)
+
+# 
+# AIC(tree)
+# 
+# pseudoR2(tree, newdata = data)
+# 
+# null <- pltree(G ~ empty_model, data = data, weights = w, gamma = TRUE, normal = prior)
+# 
+# AIC(null)
+# 
+# pseudoR2(tree, newdata = data)
+# pseudoR2(null, newdata = data)
 
 # cross-validation parameters
-folds <- as.integer(as.factor(ind$year))
-k <- max(folds)
+set.seed(123)
+k <- 100
+folds <- sample(rep(1:k, times = ceiling(n / k), length.out = n))
+
+
+library(psychotree)
+
+null <- crossvalidation(G ~ empty_model, 
+                        data = data, 
+                        k = k, 
+                        folds = folds,
+                        bonferroni = TRUE)
+
+clim <- crossvalidation(G ~ minNT_rep + minNT_sow2rep + minNT_sow2gra,
+                        data = data, 
+                        k = k, 
+                        folds = folds,
+                        bonferroni = TRUE,
+                        normal = prior, 
+                        gamma = TRUE)
+
+null
+clim
+
 
 # PlackettLuce parameters
 minsize <- round((nrow(data)*0.15), -1)
-bonferroni <- FALSE
+bonferroni <- TRUE
 alpha <- 0.05
 normal <- prior
+gamma <- TRUE
 npseudo <- 0.5
 
 # forward selection parameters 
-data$empty_model <- 1
-vars <- names(data)[2:ncol(data)]
+vars <- names(data)[grepl("minNT|maxNT", names(data))] #names(data)[2:27]#ncol(data)]
+vars <- c("empty_model", vars)
 var_keep <- character()
 coeffs <- list()
 counter <- 1
@@ -90,14 +192,16 @@ while (best) {
                k = k, 
                folds = folds, 
                alpha = alpha,
-               minsize = minsize)
+               minsize = 250, 
+               npseudo = 20,
+               bonferroni = TRUE)
   
   i <- 1:fs
   
   # get predictions from nodes and put in matrix
   models <- foreach::foreach(i = i,
                              .combine = .comb) %dopar% (.forward_dopar(as.formula(
-                               paste0("P ~ ", paste(c(var_keep, vars[i]), collapse = " + "))
+                               paste0("G ~ ", paste(c(var_keep, vars[i]), collapse = " + "))
                                  ),
                                  args))
   
