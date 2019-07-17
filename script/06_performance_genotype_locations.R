@@ -35,54 +35,34 @@ G <- to_rankings(data = df,
 #.................................................
 #.................................................
 # Set parameters ####
-keep <- grepl("NT_", names(ind))
+keep <- grepl("NT_|DT_", names(ind))
 
 data <- cbind(G, ind[keep])
 
 n <- nrow(data)
 
-fit <- pltree(G ~ ., 
+fit <- pltree(G ~ minDT_veg, 
               data = data, 
-              npseudo = 15)
+              npseudo = 15,
+              gamma = TRUE)
 
-
+fit
 
 items <- dimnames(coef(fit))[[2]]
 
-coeffs <- as_tibble(t(coef(fit)))
-names(coeffs) <- paste0("node",1:ncol(coeffs))
+coeffs <- as_tibble(t(itempar(fit)))
+names(coeffs) <- paste0("n",1:ncol(coeffs))
 coeffs <- bind_cols(items = items, coeffs)
 
-plot(coeffs$node1)
-plot(coeffs$node2)
-
-# # Check if elevation play a role in the performance of varieties in Ethiopia ####
-# nodes <- partykit::nodeids(tree, terminal = TRUE)
-# 
-# #get the estimates from nodes
-# node <- list()
-# 
-# for(i in seq_along(nodes)){
-#   node[[i]] <- tree[[ nodes[i] ]]$node$info$object %>%
-#     itempar(., vcov = TRUE, alias = FALSE) %>%
-#     qvcalc::qvcalc.itempar(.) %>%
-#     extract2(2) %>%
-#     as.matrix() %>%
-#     as_tibble() %>%
-#     mutate(items = items)
-# }
-# 
-# node <- bind_cols(items = node[[1]]$items, 
-#                   n1 = node[[1]]$estimate, 
-#                   n2 = node[[2]]$estimate )
-
-#read the passport data
+# ..................................
+# ..................................
+# read the passport data ####
 pass <- read_csv("data/passport_data_durumwheat.csv")
 
 pass %<>%
   mutate(items = genotype) %>%
   inner_join(. , coeffs, by = "items") %>%
-  dplyr::select(. , items, lon , lat , node1, node2, adm1) %>% 
+  dplyr::select(. , items, lon , lat , n1, n2, adm1) %>% 
   filter(!is.na(lon))
 
 # get the elevation from origin of items
@@ -91,25 +71,73 @@ pass %<>%
 
 r <- stack("data/SRTM_NE_250m.tif")
 
-e <- extract(r, pass[c("lon","lat")], buffer = 500)
+e <- extract(r, pass[c("lon","lat")], buffer = 1000)
 
 names(e) <- paste0(pass$items,".")
 
 e <- unlist(e, use.names = TRUE)
 
-e <- as.data.frame(cbind(items = str_split(names(e), pattern = "[.]", simplify = T)[,1], elev = e))
+e <- bind_cols(items = str_split(names(e), pattern = "[.]", 
+                                 simplify = TRUE)[,1], 
+                         elev = e)
+# ..............................
+# ..............................
+# create groups and calculate the difference ####
 
-rownames(e) <- 1:nrow(e)
-
-#add to the main data
-pass %>%
-  inner_join(., e , by = "items", all.y = TRUE) %>%
-  mutate(dif = node1 - node2,
-         group = ifelse(node1 >= mean(node1) & node2 <= mean(node2), 1,
-                        ifelse(node1 <= mean(node1) & node2 >= mean(node2), 2, 1)),
-         elev = as.numeric(as.character(elev))) ->
+pass %>% 
+  mutate(group = ifelse(n1 >= mean(n1), 1, 2),
+         group = ifelse(n2 >= mean(n2), 2, 1)) -> 
   df
+
+df
+
+# add elevation data
+df %<>% 
+  inner_join(., e , by = "items", all.y = TRUE)
+
+str(df)
 
 ttest <- with(df,
               t.test(elev ~ group))
 ttest
+
+
+# ..............................
+# ..............................
+# export outputs ####
+output <- "output/heat_tolerance/"
+dir.create(output, 
+           recursive = TRUE,
+           showWarnings = FALSE)
+
+capture.output(ttest,
+               file = paste0(output, "t-test_genotype_groups.txt"))
+
+
+capture.output(fit,
+               summary(fit),
+               file = paste0(output, "PL-fit_genotype_groups.txt"))
+
+
+
+df %<>% 
+  rename(genotype = items) %>% 
+  group_by(genotype) %>% 
+  summarise(elev = mean(elev),
+            lon = unique(lon),
+            lat = unique(lat),
+            group = unique(group)) 
+
+# add missing genotypes
+
+x <- bind_cols(genotype = items[!items %in% df$genotype],
+               elev = rep(NA,4),
+               lon = rep(NA,4),
+               lat = rep(NA,4),
+               group = rep(NA,4))
+
+df <- bind_rows(df, x)
+
+write_csv(df, paste0(output, "genotype_groups.csv"))
+
+

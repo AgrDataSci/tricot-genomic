@@ -30,28 +30,6 @@ ind %<>%
 
 #.....................................
 #.....................................
-# # filter data ####
-# df %>%
-#   group_by(id) %>%
-#   summarise(keep = length(id)) %>%
-#   mutate(keep = keep > 2) %>% 
-#   filter(keep) ->
-#   keep
-# 
-# # apply the logical vector
-# id <- df$id %in% keep$id
-# 
-# # keep selected observations
-# df <- df[id,]
-# 
-# # filter explanatory variables
-# id <- ind$id %in% keep$id
-# 
-# ind <- ind[id, ]
-
-
-#.....................................
-#.....................................
 # create PlackettLuce rankings ####
 G <- to_rankings(data = df,
                  items = "genotype",
@@ -75,50 +53,37 @@ w <- 2 - (w * 0.1)
 # Set parameters for forward selection ####
 #out <- !grepl("Rx1day|Rx5day|SU|Rtotal|SDII", names(ind))
 #ind <- ind[out]
-keep <- grepl("NT_|DT_", names(ind))
+keep <- grepl("DT_|NT_", names(ind))
 
 data <- cbind(G, empty_model = 0, ind[keep])
 
 n <- nrow(data)
 
-null <- pltree(G ~ empty_model, 
+null <- pltree(G ~ empty_model,
                data = data,
-               npseudo = 15)
+               npseudo = 5)
 
-clim <- pltree(G ~ maxDT_sow2gra,
+clim <- pltree(G ~ .,
                data = data,
-               alpha = 0.8)
+               npseudo = 5,
+               gamma = TRUE)
 
-clim
-
-pseudoR2(null)
-pseudoR2(clim)
-
-predict(null)
-predict(clim)
-
-
-t(coef(clim))
 
 # cross-validation parameters
-set.seed(123)
+#set.seed(123)
+#k <- 100
+#folds <- sample(rep(1:k, times = ceiling(n / k), length.out = n))
 folds <- as.integer(as.factor(ind$year))
 k <- max(folds)
-#k <- 10
-#folds <- sample(rep(1:k, times = ceiling(n / k), length.out = n))
-
-
 
 # PlackettLuce parameters
-minsize <- round((nrow(data)*0.15), -1)
-bonferroni <- TRUE
+# minsize <- round((nrow(data)*0.15), -1)
 alpha <- 0.05
-normal <- prior
 gamma <- TRUE
-npseudo <- 0.5
+npseudo <- 5
 
 # forward selection parameters 
-vars <- names(data)[grepl("minNT|maxNT", names(data))] #names(data)[2:27]#ncol(data)]
+vars <- names(data)[2:ncol(data)]
 vars <- c("empty_model", vars)
 var_keep <- character()
 coeffs <- list()
@@ -140,10 +105,8 @@ while (best) {
   args <- list(data = data, 
                k = k, 
                folds = folds, 
-               alpha = alpha,
-               minsize = 250, 
-               npseudo = 20,
-               bonferroni = TRUE)
+               alpha = alpha, 
+               npseudo = npseudo)
   
   i <- 1:fs
   
@@ -206,7 +169,7 @@ while (best) {
     
     modpar <- apply(modpar, 1, function(x){
       .mean_crossvalidation(x, 
-                            folds = folds, ...)
+                            folds = folds)
     })
     
     # if AIC or deviance are selected then the model 

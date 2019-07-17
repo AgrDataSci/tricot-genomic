@@ -98,18 +98,18 @@ df %>%
 
 # ............................................
 # ............................................
-# rainfall indices ####
+# # rainfall indices ####
 rain <- NULL
-for(i in seq_len(ncol(span))) {
-  
-  r <- rainfall(chirps,
-                day.one = dates[[i]],
-                span = span[[i]])
-  
-  names(r) <- paste(names(r), names(dates)[i], sep = "_")
-  
-  rain <- bind_cols(rain, r)
-}
+# for(i in seq_len(ncol(span))) {
+#   
+#   r <- rainfall(chirps,
+#                 day.one = dates[[i]],
+#                 span = span[[i]])
+#   
+#   names(r) <- paste(names(r), names(dates)[i], sep = "_")
+#   
+#   rain <- bind_cols(rain, r)
+# }
 
 
 rain
@@ -125,7 +125,7 @@ rain <- rain[drop]
 # temperature indices ####
 temp <- NULL
 for(i in seq_len(ncol(span))) {
-  h <- temperature(modis_approx,
+  h <- temperature(df[c("lon","lat")],#modis_approx,
                    day.one = dates[[i]],
                    span = span[[i]])
   
