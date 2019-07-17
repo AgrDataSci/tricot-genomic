@@ -1,4 +1,3 @@
-# 
 library("tidyverse")
 library("magrittr")
 library("PlackettLuce")
@@ -20,8 +19,8 @@ df %<>%
   read_csv()
 
 
-# additive matrix from genes
-load("data/additive.matrix.cs.rda")
+# # additive matrix from genes
+# load("data/additive.matrix.cs.rda")
 
 
 # environmental indices
@@ -31,133 +30,83 @@ ind %<>%
 
 #.....................................
 #.....................................
+# # filter data ####
+# df %>%
+#   group_by(id) %>%
+#   summarise(keep = length(id)) %>%
+#   mutate(keep = keep > 2) %>% 
+#   filter(keep) ->
+#   keep
+# 
+# # apply the logical vector
+# id <- df$id %in% keep$id
+# 
+# # keep selected observations
+# df <- df[id,]
+# 
+# # filter explanatory variables
+# id <- ind$id %in% keep$id
+# 
+# ind <- ind[id, ]
+
+
+#.....................................
+#.....................................
 # create PlackettLuce rankings ####
-# remove NAs in grain yield
-df %>% 
-  filter(!is.na(gy_gm)) -> 
-  gy
-
-# only keep strict rankings of at least 2 distinct items
-gy %>%
-  group_by(id) %>%
-  summarise(keep = length(id)) %>%
-  mutate(keep = keep > 1) %>% 
-  filter(keep) ->
-  keep
-
-# apply the logical vector
-id <- gy$id %in% keep$id
-
-# keep selected observations
-df <- gy[id,]
-
-id <- ind$id %in% keep$id
-
-ind <- ind[id, ]
-
 G <- to_rankings(data = df,
                  items = "genotype",
-                 input = "gy_gm",
+                 input = "farmer_rank",
                  id = "id", 
                  grouped.rankings = TRUE)
-
-P <- to_paircomp(G)
 
 w <- G[1:length(G) , , as.grouped_rankings = FALSE]
 w[w==0] <- NA
 w <- apply(w, 1, function(x) sum(!is.na(x)))
-w <- 1 + (w * 0.1)
+w <- 2 - (w * 0.1)
 
-
-mod <- PlackettLuce(G)
-
-# normal prior object from additive matrix
-prior <- list(mu = coef(mod),
-              Sigma = additivemat)
-
-
-# mod2 <- PlackettLuce(G, normal = prior, gamma = TRUE)
+# mod <- PlackettLuce(G)
 # 
-# AIC(mod)
-# AIC(mod2)
-
+# # normal prior object from additive matrix
+# prior <- list(mu = coef(mod),
+#               Sigma = additivemat)
 
 #.................................................
 #.................................................
 # Set parameters for forward selection ####
-out <- !grepl("Rx1day|Rx5day|SU|Rtotal|SDII", names(ind))
-ind <- ind[out]
+#out <- !grepl("Rx1day|Rx5day|SU|Rtotal|SDII", names(ind))
+#ind <- ind[out]
+keep <- grepl("NT_|DT_", names(ind))
 
-data <- cbind(G, empty_model = 0, ind[-ncol(ind)])
+data <- cbind(G, empty_model = 0, ind[keep])
 
 n <- nrow(data)
 
-# names(data)
-# 
-# head(data)
-# 
-# 
-# null <- pltree(G ~ empty_model,
-#                data = data, 
-#                weights = w)
-# 
-# AIC(null)
-# 
-# 
-# tree <- pltree(G ~ minNT_rep + minNT_sow2rep + minNT_sow2gra, 
-#                data = data, 
-#                weights = w,
-#                normal = prior, 
-#                gamma = TRUE,
-#                bonferroni = TRUE)
-# 
-# tree
-# 
-# AIC(null)
-# AIC(tree)
-# 
-# pseudoR2(null, newdata = data)
-# 
-# pseudoR2(tree, newdata = data)
-# 
-# logLik(tree)
+null <- pltree(G ~ empty_model, 
+               data = data,
+               npseudo = 15)
 
-# 
-# AIC(tree)
-# 
-# pseudoR2(tree, newdata = data)
-# 
-# null <- pltree(G ~ empty_model, data = data, weights = w, gamma = TRUE, normal = prior)
-# 
-# AIC(null)
-# 
-# pseudoR2(tree, newdata = data)
-# pseudoR2(null, newdata = data)
+clim <- pltree(G ~ maxDT_sow2gra,
+               data = data,
+               alpha = 0.8)
+
+clim
+
+pseudoR2(null)
+pseudoR2(clim)
+
+predict(null)
+predict(clim)
+
+
+t(coef(clim))
 
 # cross-validation parameters
 set.seed(123)
-k <- 100
-folds <- sample(rep(1:k, times = ceiling(n / k), length.out = n))
+folds <- as.integer(as.factor(ind$year))
+k <- max(folds)
+#k <- 10
+#folds <- sample(rep(1:k, times = ceiling(n / k), length.out = n))
 
-
-library(psychotree)
-
-null <- crossvalidation(G ~ empty_model, 
-                        data = data, 
-                        k = k, 
-                        folds = folds,
-                        bonferroni = TRUE)
-
-clim <- crossvalidation(G ~ minNT_rep + minNT_sow2rep + minNT_sow2gra,
-                        data = data, 
-                        k = k, 
-                        folds = folds,
-                        bonferroni = TRUE,
-                        normal = prior, 
-                        gamma = TRUE)
-
-null
-clim
 
 
 # PlackettLuce parameters
