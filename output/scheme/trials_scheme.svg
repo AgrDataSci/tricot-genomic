@@ -58,6 +58,14 @@
      id="layer1"
      transform="translate(0,-173)">
     <rect
+       style="fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:0.26458332;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       id="rect5824"
+       width="263.07144"
+       height="124.95538"
+       x="-1.7763568e-015"
+       y="173"
+       ry="0.05042826" />
+    <rect
        style="fill:#008000;fill-opacity:1;stroke:none;stroke-width:0.175;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="rect837"
        width="10"
