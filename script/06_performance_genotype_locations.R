@@ -41,12 +41,12 @@ data <- cbind(G, ind[keep])
 
 n <- nrow(data)
 
-fit <- pltree(G ~ minDT_veg, 
-              data = data, 
-              npseudo = 15,
-              gamma = TRUE)
-
-fit
+fit <- pltree(G ~ minDT_veg + minNT_veg,
+              data = data,
+              npseudo = 5,
+              gamma = TRUE, 
+              alpha = 0.01)
+plot(fit)
 
 items <- dimnames(coef(fit))[[2]]
 
@@ -71,7 +71,7 @@ pass %<>%
 
 r <- stack("data/SRTM_NE_250m.tif")
 
-e <- extract(r, pass[c("lon","lat")], buffer = 1000)
+e <- extract(r, pass[c("lon","lat")], buffer = 100)
 
 names(e) <- paste0(pass$items,".")
 
