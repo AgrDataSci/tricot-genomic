@@ -1,34 +1,21 @@
-
-
-
-
+# create a SpatialPoints object from accessions locations
 library("tidyverse")
 library("magrittr")
-library("janitor")
-library("sf")
+library("rgeos")
+library("rgdal")
 
 pass <- "data/passport_data_durumwheat.csv"
 pass %<>% 
   read_csv() 
 
+pass %<>% 
+  filter(!is.na(lon)) %>% 
+  select(genotype, lon, lat)
 
-eth <-
-  raster::getData("GADM", country = "ETH", path = "data", level = 1) %>% 
-  st_as_sf()
+proj <- "+proj=longlat +datum=WGS84 +no_defs +ellps=WGS84 +towgs84=0,0,0"
 
-pass %>%
-  dplyr::select(lon, lat) %>%
-  filter(!is.na(lon)) ->
-  xy
-  
-xy %>% 
-  as.matrix() %>%
-  st_multipoint() %>%
-  st_sfc(crs = st_crs(eth)) ->
-  lonlat
+p <- SpatialPointsDataFrame(pass[c("lon","lat")], pass, 
+                            proj4string = CRS(proj))
 
-plot(eth["GID_1"], col = "#F2F2F2", reset = FALSE)
-plot(lonlat, col = "blue", cex = 1,
-     bg = "Steelblue1", pch = 21, add = TRUE)
 
 
