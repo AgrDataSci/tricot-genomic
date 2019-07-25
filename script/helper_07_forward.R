@@ -1,6 +1,11 @@
+library("abind")
+library("gosset")
+library("parallel")
+library("doParallel")
+
 # combine results from parallel
 .comb <- function(...) {
-  abind::abind(..., along = 1, force.array = TRUE)
+  abind::abind(..., along = 2, force.array = TRUE)
 }
 
 # model call for parallel
@@ -10,12 +15,8 @@
   
   m <- do.call(gosset::crossvalidation, args)
   
-  result <- m$raw$estimators
-  
-  nfold <- max(m$raw$folds)
-  
-  result  <- array(unlist(result), c(1, nfold, 6))
-  
+  result <- m$raw$estimators$deviance
+
   return(result)
   
 }

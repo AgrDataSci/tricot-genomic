@@ -19,12 +19,13 @@ Kauê de Sousa^1,2^, Jacob van Etten^2^, Svein Ø. Solberg^1^, Mario Enrico Pè^
 ^[*]^Correspondence should be addressed to MDA (email: <m.dellacqua@santannapisa.it>)
 
 
-# Research questions:
-
-
-* Does farmers' evaluations associated with genes provide better predictions on varietal performance then station-only data?
-* Can the GxE estimates be improved by farmers' evaluations associated to SNP markers?
-* Can the combination of genomic and citizen science provide new insights in which traits farmers prioritise or which areas of the genome play a role?
+# Introduction 
+- wheat is the second largest ceral grain cultivated worldwide
+- durum wheat is mainly used for pasta production 
+- is a cultivar evolved from domesticated emmer wheat 
+- most of its genetic diversity is found in Ethiopia 
+- even though most farmers are exposed to a small set of Mediterranean modern varieties
+- 
 
 # Methods  
 
