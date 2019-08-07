@@ -1,28 +1,18 @@
-# Add environmental variables using planting dates 
-# and lon lat
-
-library("tidyverse")
-library("magrittr")
-library("janitor")
+# characterise climate in station plots 
 library("ClimMobTools")
-library("caret")
 
-#.......................................
-#.......................................
-# Read data ####
-df <- "data/durumwheat.csv"
-df %<>% 
-  read_csv()
-
-items <- unique(df$genotype)
-
-df %<>% 
-  select(id, genotype, lat, lon, planting_date, year)
+lonlat <- matrix(c(38.866667 , 11.666667,
+                   39.166667 , 13.650000), 
+                 ncol = 2, nrow = 2, byrow = TRUE)
 
 
-# load("data/chirps.rda")
+lonlat <- rbind(lonlat, lonlat)
 
-# load("data/modis.rda")
+dimnames(lonlat)[[2]]<-c("lon","lat")
+
+pdates <- rep(c("2012-07-05","2013-07-08"), each = 2)
+pdates <- as.Date(pdates, format = "%Y-%m-%d")
+
 
 #......................................
 #......................................
@@ -34,45 +24,18 @@ met %<>%
   rename(genotype = ID) %>% 
   as_tibble(.name_repair = janitor::make_clean_names) 
 
-keep <- met$genotype %in% items
-
-met <- met[keep, ]
-
 # take the means for each genotype
 met %<>% 
-  group_by(genotype) %>% 
+  group_by(year, location) %>% 
   summarise(db = as.integer(mean(db, na.rm = TRUE)),
             df = as.integer(mean(df, na.rm = TRUE)),
-            dm = as.integer(mean(dm, na.rm = TRUE)))
+            dm = as.integer(mean(dm, na.rm = TRUE))) %>% 
+  ungroup()
 
 
-# add it to the main dataset
-df %<>% 
-  merge(. , met, by = "genotype", all.x = TRUE) %>% 
-  as_tibble() %>% 
-  arrange(id)
+df <- bind_cols(met, planting_date = pdates)
 
-
-df %>% 
-  group_by(id) %>% 
-  summarise(db = as.integer(max(db, na.rm = TRUE)),
-            df = as.integer(max(df, na.rm = TRUE)),
-            dm = as.integer(max(dm, na.rm = TRUE))) ->
-  ts
-
-
-# keep unique id values in the main dataset
-df %<>%
-  distinct(id, .keep_all = TRUE)
-
-# and combine it with ts
-# add it to the main dataset
-df %<>% 
-  select(-db, -df, -dm) %>% 
-  merge(. , ts, by = "id", all.x = TRUE) %>% 
-  as_tibble() %>% 
-  arrange(id)
-
+# calculate spans
 
 # Dates for booting, flowering and maturity
 df %>% 
@@ -101,13 +64,13 @@ df %>%
 # # rainfall indices ####
 rain <- NULL
 for(i in seq_len(ncol(span))) {
-
-  r <- rainfall(df[c("lon","lat")],
+  
+  r <- rainfall(lonlat,
                 day.one = dates[[i]],
                 span = span[[i]])
-
+  
   names(r) <- paste(names(r), names(dates)[i], sep = "_")
-
+  
   rain <- bind_cols(rain, r)
 }
 
@@ -125,7 +88,7 @@ rain <- rain[drop]
 # temperature indices ####
 temp <- NULL
 for(i in seq_len(ncol(span))) {
-  h <- temperature(df[c("lon","lat")],
+  h <- temperature(lonlat,
                    day.one = dates[[i]],
                    span = span[[i]])
   
@@ -148,14 +111,8 @@ print(names(indices)[out])
 
 indices <- indices[-out]
 
-indices %<>% 
-  mutate(year = df$year,
-         lat = df$lat,
-         lon = df$lon,
-         id = df$id)
+indices <- cbind(indices, lonlat, df[,c("location","year")])
+
+write_csv(indices, "data/environmental_indices_station.csv")
 
 
-write_csv(indices, "data/environmental_indices.csv")
-
-
-indices

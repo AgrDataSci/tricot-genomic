@@ -71,7 +71,7 @@ pass %<>%
 
 r <- stack("data/SRTM_NE_250m.tif")
 
-e <- extract(r, pass[c("lon","lat")], buffer = 100)
+e <- extract(r, pass[c("lon","lat")], buffer = 500)
 
 names(e) <- paste0(pass$items,".")
 
