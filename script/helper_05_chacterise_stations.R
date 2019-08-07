@@ -1,16 +1,20 @@
 # characterise climate in station plots 
 library("ClimMobTools")
+library("tidyverse")
+library("magrittr")
+library("caret")
 
-lonlat <- matrix(c(38.866667 , 11.666667,
-                   39.166667 , 13.650000), 
-                 ncol = 2, nrow = 2, byrow = TRUE)
+lonlat <- c(38.866667, 11.666667, 39.166667 , 13.650000)
 
+lonlat <-  matrix(rep(lonlat, times = 15), 
+                  nrow = 30, 
+                  ncol = 2, 
+                  byrow = TRUE)
 
-lonlat <- rbind(lonlat, lonlat)
+dimnames(lonlat)[[2]] <- c("lon","lat")
 
-dimnames(lonlat)[[2]]<-c("lon","lat")
-
-pdates <- rep(c("2012-07-05","2013-07-08"), each = 2)
+pdates <- paste0(2001:2015, c("-07-05"))
+pdates <- rep(pdates, each = 2)
 pdates <- as.Date(pdates, format = "%Y-%m-%d")
 
 
@@ -26,14 +30,13 @@ met %<>%
 
 # take the means for each genotype
 met %<>% 
-  group_by(year, location) %>% 
   summarise(db = as.integer(mean(db, na.rm = TRUE)),
             df = as.integer(mean(df, na.rm = TRUE)),
             dm = as.integer(mean(dm, na.rm = TRUE))) %>% 
   ungroup()
 
 
-df <- bind_cols(met, planting_date = pdates)
+df <- cbind(met, planting_date = pdates)
 
 # calculate spans
 
@@ -111,8 +114,17 @@ print(names(indices)[out])
 
 indices <- indices[-out]
 
-indices <- cbind(indices, lonlat, df[,c("location","year")])
+indices <- cbind(indices, 
+                 lonlat,
+                 location = rep(c("geregera","hagreselam"), times = 15),
+                 year = format(df$planting_date, "%Y"))
 
 write_csv(indices, "data/environmental_indices_station.csv")
+
+
+ttest <- with(indices,
+              t.test(minDT_veg ~ location))
+
+
 
 

@@ -69,9 +69,9 @@ npseudo <- 5
 folds <- as.integer(as.factor(ind$year))
 k <- max(folds)
 
-keep <- grepl("DT_|NT_", names(ind))
+keep <- grepl("DT_|NT_|MLWS_|MLDS_", names(ind))
 
-#data <- cbind(G, empty_model = 0, ind[keep])
+data <- cbind(G, empty_model = 0, ind[keep])
 
 data <- cbind(G, ind[keep])
 
