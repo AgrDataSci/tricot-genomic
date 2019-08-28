@@ -21,49 +21,42 @@ Kauê de Sousa^1,2^, Jacob van Etten^2^, Svein Ø. Solberg^1^, Mario Enrico Pè^
 
 # Introduction 
 - wheat is the second largest ceral grain cultivated worldwide
-- durum wheat is mainly used for pasta production 
-- is a cultivar evolved from domesticated emmer wheat 
-- most of its genetic diversity is found in Ethiopia 
+- most of durum wheat's genetic diversity is found in Ethiopia 
 - even though most farmers are exposed to a small set of Mediterranean modern varieties
 - 
 
-# Methods  
-
-## Genomic prediction
-
-RBlup to genomic prediction with SNP markers. Farmers' evaluation from citizen science trials are connected to this approach by adding the probability of winning from Plackett-Luce as explanatory variables. Other explanatory variables include the metric traits from station experiments.
+# Part 1
 
 
-## GxE interactions
+```{r, fig.margin=TRUE, echo=FALSE, fig.cap="Fig. 1. Research method."}
+knitr::include_graphics("../output/scheme/Fig1.png")
+```
 
-Split varieties from citizen science trails by groups from their origin (cold tolerants vs others). This can also be used in the genomic prediction.
 
-Run a number of scenarios from varieties selection using the citizen science and station data to determine whether the genetic information provides any gain or not.
+# Part 2
 
-**Scenario 1**  
+Farmer evaluation traits can predict metric traits fairly well, depending on their derivation.  Overall, spike, and GY observed in first year have a similar performance in predicting GY in the second year (Fig. 2A). Farmers scores (both overall and spike) well predict TGW in 2013. There is a gender interaction, especially in overall, as arguably men and women have a different interpretation of the overall appreciation of varieties. When men and women criteria are contrasting, the prediction power decreases (see overall, overall.f and overall.m over GY in 2013). When they are aligned, the prediction power increases (see overall, overall.f and overall.m over DF in 2013; farmers are very worried about late maturation of varieties).
 
-Baseline: tricot without genomic prediction, blocked cross-validation with seasons as blocks
+```{r echo=FALSE, fig.cap="Fig. 2. R", fig.height=1, fig.margin=TRUE, fig.width=1}
+knitr::include_graphics("../output/gp/Fig2.png")
+```
 
-* Plackett-Luce model
-* Bradley-Terry model. Improvement: same exercise, but adding genomic data as explanatory data
-* Plackett-Luce model with covariance matrix derived from genomic data
-* Bradley-Terry model with genomic random variables in a GLM framework(?)  
 
-**Scenario 2**  
+# Part 3
 
-Baseline: farmer preferences from station rating exercise, predicting field performance in tricot perhaps stratifying by environment and using the two station sites separately for their respective most similar environments (to circumvent GxE).
+```{r, fig.margin=TRUE, echo=FALSE, fig.cap="Fig. 3. Expected yield gain of adopting variety recommendations based on (L) location model, (E) environmental model and (GxE) genotype by environmental model.", fig.height=5, fig.width=5}
+knitr::include_graphics("../output/yield_gain/yield_gain.png")
+```
 
-Predict rating data with an appropriate GLM model for ordinal data (the rates should not be assumed to be equidistant, the difference between rates 1 and 2 may be different from the rates between 4 and 5).
 
-Improvement: same farmer preferences + genomic data, letting the ordering be influenced by genomic relatedness
-The exercise could use rank correlation, Kendall´s tau as criterion, but could also make a real “selection” (say top 50%) of the accessions and determine the gain as the % that indeed falls in the top 50% in the tricot trial. A p value for this exercise could be determined by doing 10,000 random selections of 50% to get a null distribution.
 
-# Topics for discussion (or keep in mind)
 
-* GxE driven by under-representative samples or farm management.
-* Is data missingness non-random? Can data missingness be predicted from farmer preferences? 
-* Can we say something about which genomic regions play a role?
+# Methods
 
 
 # References
+
+
+# Display items
+
 

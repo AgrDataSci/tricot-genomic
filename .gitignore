@@ -18,5 +18,7 @@
 
 # Other files
 /temporary
+/processing
+/manuscript
 /data/SRTM_NE_250m.tif
 .Rproj.user

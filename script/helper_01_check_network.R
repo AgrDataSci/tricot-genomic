@@ -13,10 +13,10 @@ df %<>%
 
 table(df$accession, df$region)
 
-R <- to_rankings(data = df,
-                 items = "genotype",
-                 input = "farmer_rank",
-                 id = "id")
+R <- rank_PL(data = df,
+             items = "genotype",
+             input = "farmer_rank",
+             id = "id")
 
 
 adj <- adjacency(R)

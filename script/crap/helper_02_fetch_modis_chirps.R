@@ -118,7 +118,7 @@ for(i in 1:dim(modis)[1]){
   modis_approx[i,,1] <- approx(modis[i,,1], n = length(full_dates))[[2]]
   modis_approx[i,,2] <- approx(modis[i,,2], n = length(full_dates))[[2]]
 }
-#save(modis, modis_approx, file = "data/modis.rda")
+save(modis, modis_approx, file = "data/modis.rda")
 
 
 #.......................................

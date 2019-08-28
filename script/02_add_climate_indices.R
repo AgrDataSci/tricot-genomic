@@ -10,9 +10,12 @@ library("caret")
 #.......................................
 #.......................................
 # Read data ####
-df <- "data/durumwheat.csv"
-df %<>% 
-  read_csv()
+# tricot data
+df <- read_csv("data/durumwheat.csv")
+
+# station data
+load("data/diversity.panel.data.gp.Rdata")
+rm(snp.pos, info, geno, farm)
 
 items <- unique(df$genotype)
 
@@ -20,16 +23,12 @@ df %<>%
   select(id, genotype, lat, lon, planting_date, year)
 
 
-# load("data/chirps.rda")
-
-# load("data/modis.rda")
+#load("data/chirps.rda")
+#load("data/modis.rda")
 
 #......................................
 #......................................
-# Define time span for phenological phases ####
-# using station data
-load("data/diversity.panel.data.gp.Rdata")
-
+# Define time span for phenological stages ####
 met %<>% 
   rename(genotype = ID) %>% 
   as_tibble(.name_repair = janitor::make_clean_names) 
@@ -53,12 +52,18 @@ df %<>%
   arrange(id)
 
 
-df %>% 
+# impute values for missing genotypes
+df %<>%
+  mutate(db = ifelse(is.na(db), mean(db, na.rm = TRUE), db),
+         df = ifelse(is.na(df), mean(df, na.rm = TRUE), df),
+         dm = ifelse(is.na(dm), mean(dm, na.rm = TRUE), dm))
+
+ts <-
+  df %>% 
   group_by(id) %>% 
   summarise(db = as.integer(max(db, na.rm = TRUE)),
             df = as.integer(max(df, na.rm = TRUE)),
-            dm = as.integer(max(dm, na.rm = TRUE))) ->
-  ts
+            dm = as.integer(max(dm, na.rm = TRUE)))
 
 
 # keep unique id values in the main dataset
@@ -75,25 +80,25 @@ df %<>%
 
 
 # Dates for booting, flowering and maturity
-df %>% 
+dates <- 
+  df %>% 
   select(planting_date, db, df, dm) %>% 
   mutate(veg = planting_date,
          rep = (planting_date + db) -8,
          gra = planting_date + df,
          sow2rep = planting_date,
          sow2gra = planting_date) %>% 
-  select(-planting_date, -db, -df, -dm) -> 
-  dates
+  select(-planting_date, -db, -df, -dm)
 
-df %>% 
+span <- 
+  df %>% 
   select(planting_date, db, df, dm) %>% 
   mutate(veg = db,
          rep = (df - db) + 15,
          gra = dm - df,
          sow2rep = df,
          sow2gra = dm) %>% 
-  select(-planting_date, -db, -df, -dm) -> 
-  span
+  select(-planting_date, -db, -df, -dm)
 
 
 # ............................................
@@ -152,10 +157,11 @@ indices %<>%
   mutate(year = df$year,
          lat = df$lat,
          lon = df$lon,
+         xy = df$lon + df$lat,
+         yx = df$lon - df$lat,
          id = df$id)
 
 
 write_csv(indices, "data/environmental_indices.csv")
-
 
 indices

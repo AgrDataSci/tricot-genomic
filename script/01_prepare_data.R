@@ -1,7 +1,8 @@
-####################################################
-###### Read and clean durum wheat in Ethiopia
-# Updated 11Jun2019
-####################################################
+# ..........................................
+# ..........................................
+# Read and clean durum wheat in Ethiopia
+# ..........................................
+# ..........................................
 
 library("tidyverse")
 library("magrittr")
@@ -154,18 +155,17 @@ plot(lonlat, col = "blue", cex = 1,
 #.........................................
 # Keep consistent observations #### 
 
-out <- "data/raw/not_in_genotyping.csv"
-out %<>% 
-  read_csv() %>% 
-  select(accession) %>% 
-  t()
-
-
-out <- !df$accession %in% out
-
-# retain the observations with genotype data
-df %<>% 
-  filter(out)
+# out <- "data/raw/not_in_genotyping.csv"
+# out %<>% 
+#   read_csv() %>% 
+#   select(accession) %>% 
+#   t()
+# 
+# out <- !df$accession %in% out
+# 
+# # retain the observations with genotype data
+# df %<>% 
+#   filter(out)
 
 # add genotype codes
 g <- "data/raw/whoiswho.diversity.panel.txt"
@@ -174,15 +174,18 @@ g %<>%
   rename(accession = ID,
          genotype = DNA_CODE) %>% 
   select(accession, genotype) %>% 
-  filter(!is.na(genotype)) %>% 
   filter(!grepl("_B", genotype))
 
 
 df %<>%
   mutate(accession = tolower(accession)) %>% 
   merge(. , g, all.x = TRUE, by = "accession") %>% 
-  as_tibble() %>% 
-  filter(!is.na(genotype))
+  as_tibble() 
+
+df %<>% 
+  mutate(genotype = ifelse(is.na(genotype), accession, genotype))
+
+length(unique(df$accession)) == length(unique(df$genotype))
 
 
 # create an id for each plot and remove duplicates
@@ -200,7 +203,6 @@ df %<>%
   distinct(genotype, .keep_all = TRUE) %>% 
   distinct(farmer_rank, .keep_all = TRUE) %>% 
   as_tibble()
-
 
 # remove those tested in less than 10 farms 
 df %>% 
@@ -295,8 +297,6 @@ df %>%
             median = median(planting_date)) ->
   varing
 
-
-as.integer(rnorm(1, mean = varing$mean, sd = 10), origin = "1970-01-01")
 
 df_split <- split(df, df$id)
 
@@ -405,91 +405,4 @@ df <- df[, !names(df) %in% drop]
 
 write_csv(df, "data/durumwheat.csv")
 
-
-# # fix issues in dates ##
-# extra %>% 
-#   select(id, booting_date, flowering_date, maturity_date) -> 
-#   mdate
-# 
-# mdate[2:4] <- lapply(mdate[2:4], function(x) {
-#   
-#   check <- gsub("/", "-", x, NA)
-#   
-#   check <- strsplit(check, split =  "-")
-#   
-#   check <- do.call("rbind", check)
-#   
-#   d1 <- paste(check[,3], check[,2], check[,1], sep = "-")
-#   d1 <- as.Date(d1, format = "%Y-%m-%d")
-#   
-#   d2 <- paste(check[,3], check[,1], check[,2], sep = "-")
-#   d2 <- as.Date(d2, format = "%Y-%m-%d")
-#   
-#   check <- as.Date(check, format = "%d/%m/%Y")
-#   
-#   x <- ifelse(grepl("-", x), x, NA)
-#   x <- as.Date(x, format = "%d-%m-%Y")
-#   
-#   x <-   ifelse(is.na(x),
-#                 check, 
-#                 x)
-#   x <- as.Date(x, origin = "1970-01-01")
-#   return(x)
-#   
-# })
-# 
-# 
-# # calculate days to flowering and to maturity
-# df %<>% 
-#   mutate(days2flower = flowering_date - planting_date,
-#          days2maturity = maturity_date - planting_date)
-# 
-# plot(df$days2flower)
-# plot(df$days2maturity)
-# # remove outliers
-# df %<>% 
-#   mutate(days2flower = ifelse(days2flower < 40 | days2flower > 110, NA, days2flower))
-# 
-# 
-# # try to impute some missing data
-# # sum(is.na(df$days2flower))
-# # sum(is.na(df$days2maturity))
-# # 
-# # boxplot(df$days2flower ~ as.factor(df$region))
-# df %<>% 
-#   mutate(days2flower = ifelse(is.na(days2flower), 
-#                               median(days2flower, na.rm = TRUE), 
-#                               days2flower),
-#          days2maturity = ifelse(is.na( days2maturity), 
-#                                 median( days2maturity, na.rm = TRUE), 
-#                                 days2maturity))
-# plot(df$days2flower)
-# plot(df$days2maturity)
-
-
-# # reshape values
-# df %>%
-#   select(farmer_no, plot_no, accession) %>%
-#   spread(.,
-#          key = plot_no,
-#          value = "accession") ->
-#   vars
-# 
-# names(vars)[2:5] <- paste0("variety_", letters[1:4])
-# 
-# df %>%
-#   select(farmer_no, plot_no,farmer_rank) %>%
-#   spread(.,
-#          key = plot_no,
-#          value = "farmer_rank") ->
-#   R
-# 
-# names(R)[2:5] <- paste0("rank_variety_", letters[1:4])
-# 
-# # merge data
-# df %<>%
-#   select(-accession, -farmer_rank, -plot_no) %>%
-#   distinct(farmer_no, .keep_all = TRUE) %>%
-#   inner_join(. , vars, by = "farmer_no",all.x = TRUE) %>%
-#   inner_join(. , R, by = "farmer_no", all.x = TRUE)
 
