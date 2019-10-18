@@ -58,7 +58,7 @@ am[1:10, 1:10]
 
 am[genitems,] <- gene
 
-am[1:10, 1:10]
+am[1:10, ]
 
 am <- t(am)
 
@@ -122,6 +122,7 @@ gen <- crossvalidation(G ~ minDT_veg + minNT_veg,
                        drop.folds = out,
                        minsize = minsize,
                        alpha = alpha,
+                       gamma = gamma,
                        normal = prior)
 
 print(gen)
@@ -138,6 +139,5 @@ print(loc)
 
 save(null, env, gen, loc,
      file = paste0(output, "models.rda"))
-
 
 

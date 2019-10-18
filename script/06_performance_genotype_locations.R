@@ -26,11 +26,11 @@ ind %<>%
 #.....................................
 #.....................................
 # create PlackettLuce rankings ####
-G <- to_rankings(data = df,
-                 items = "genotype",
-                 input = "farmer_rank",
-                 id = "id", 
-                 grouped.rankings = TRUE)
+G <- rank_PL(data = df,
+             items = "genotype",
+             input = "farmer_rank",
+             id = "id",
+             grouped = TRUE)
 
 #.................................................
 #.................................................

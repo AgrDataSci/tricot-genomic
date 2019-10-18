@@ -1,5 +1,7 @@
 # compute gain in grain yield based on model predictions
-reliability_gy <- function(object, gy, weights = c(0.5, 0.3, 0.2), sort = "yield") {
+reliability_gy <- function(object, gy, 
+                           weights = c(0.5, 0.3, 0.2), 
+                           sort = "yield") {
   
   if(sum(weights) != 1) {
     stop("Sum of weights is not 1")
