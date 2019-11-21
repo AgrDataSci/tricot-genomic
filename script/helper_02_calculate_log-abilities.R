@@ -19,60 +19,98 @@ df %<>%
 output <- "output/log-abilities/"
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 
-#.....................................
-#.....................................
-# farmer rank ####
+items <- unique(df$genotype)
+items <- items[grepl("_D", items)]
 
-# create PlackettLuce rankings 
-R <- to_rankings(data = df,
-                 items = "genotype",
-                 input = "farmer_rank",
-                 id = "id")
+
+df <- df[df$genotype %in% items, ]
+
+# only keep strict rankings of at least 2 distinct items
+df %>%
+  group_by(id) %>%
+  summarise(keep = length(id)) %>%
+  mutate(keep = keep > 1) %>% 
+  filter(keep) ->
+  keep
+
+# apply the logical vector
+id <- df$id %in% keep$id
+
+# keep selected observations
+df <- df[id,]
+
+#.....................................
+#.....................................
+# probabilities for all years ####
+
+R <- rank_PL(data = df,
+             items = "genotype",
+             input = "farmer_rank",
+             id = "id")
 
 mod <- PlackettLuce(R)
 
-svg(filename = paste0(output, "coeff_farmer_rank_PL.svg"),
-    width = 10,
-    height = 6.5,
-    pointsize = 12)
-plot(qvcalc(itempar(mod, log = TRUE)), las = 2)
-dev.off()
+pars <- itempar(mod, log = FALSE)
 
-
-winprobs <- itempar(mod, log = TRUE)
-
-winprobs <- bind_cols(genotype = names(winprobs),
-                      pow_rank = as.vector(winprobs))
+pars <- bind_cols(genotype = names(pars),
+                  pow_rank = as.vector(pars),
+                  season = rep("all", length(pars)))
 
 
 #.....................................
 #.....................................
-# farmer rank BradleyTerry ####
+# probabilities for each year ####
 
-# get a binomial rank
-B <- rank_binomial(R, drop.null = TRUE)
+# split into seasons
+R <- split(df, df$year)
 
-mod <- BTm(cbind(win1, win2), player1, player2, ~ genotype,
-           id = "genotype", data = B)
+probs <- array(NA, dim = c(nrow(pars), 3, 3),
+               dimnames = list(pars$genotype, 
+                               c("genotype","pow_rank","season"),
+                               1:3))
+# run over years
+for(i in seq_along(R)) {
+  r <- rank_PL(data = R[[i]],
+               items = "genotype",
+               input = "farmer_rank",
+               id = "id")
+  
+  mod <- PlackettLuce(r)
+  
+  p <- itempar(mod, log = FALSE)
+  
+  p <- as.matrix(p)
+  
+  probs[dimnames(p)[[1]], 2, i] <- p[,1]
+  
+  probs[,1,i] <- pars$genotype
+  
+  probs[, 3, i] <- names(R[i]) 
+  
+
+}
+
+probs <- as_tibble(apply(probs, 2L, c))
+
+probs %<>% 
+    mutate(pow_rank = as.numeric(pow_rank))
+
+probs <- bind_rows(pars, probs)
+
+probs <- probs[probs$genotype %in% items, ]
+
+probs %<>% 
+  group_by(genotype) %>% 
+  mutate(pow_rank = ifelse(is.na(pow_rank), mean(pow_rank, na.rm = TRUE), pow_rank)) %>% 
+  ungroup()
+
+probs %<>% 
+  group_by(season) %>% 
+  mutate(pow_rank = pow_rank / sum(pow_rank)) %>% 
+  ungroup()
 
 
-summary(mod)
-
-x <- coef(mod)
-
-names(x) <- gsub("genotype","",names(x))
-
-x <- tibble(genotype = names(x),
-            pow_rank_bt = x)
-
-winprobs %<>% 
-  merge(. , x, by = "genotype", all.x = TRUE) %>% 
-  as_tibble()
-
-winprobs %<>% 
-  mutate(pow_rank_bt = ifelse(is.na(pow_rank_bt),
-                              0,
-                              pow_rank_bt))
+winprobs <- probs
 
 
 #...........................
@@ -83,6 +121,12 @@ winprobs %<>%
 df %>% 
   filter(!is.na(gy_gm)) -> 
   gy
+
+
+gy %<>% 
+  group_by(id) %>% 
+  distinct(gy_gm, .keep_all = TRUE) %>% 
+  ungroup()
 
 # only keep strict rankings of at least 2 distinct items
 gy %>%
@@ -98,90 +142,110 @@ id <- gy$id %in% keep$id
 # keep selected observations
 gy <- gy[id,]
 
+# ............................
+# ............................
+# all data 
+R <- rank_PL(data = gy,
+             items = "genotype",
+             input = "gy_gm",
+             id = "id")
 
-# grain yield into rankings
-YR <- to_rankings(data = gy,
-                  items = "genotype",
-                  input = "gy_gm",
-                  id = "id")
+mod <- PlackettLuce(R)
 
+pars <- itempar(mod, log = FALSE)
 
-mod_gy <- PlackettLuce(YR)
-
-
-svg(filename = paste0(output, "coeff_grainyield_rank_PL.svg"),
-    width = 10,
-    height = 6.5,
-    pointsize = 12)
-plot(qvcalc(itempar(mod_gy, log = TRUE)), las = 2)
-dev.off()
+pars <- bind_cols(genotype = names(pars),
+                  pow_rank = as.vector(pars),
+                  season = rep("all", length(pars)))
 
 
-winprobs_gy <- itempar(mod_gy, log = TRUE)
 
-winprobs_gy <- bind_cols(genotype = names(winprobs_gy),
-                         pow_gy = as.vector(winprobs_gy))
-
-winprobs %<>% 
-  merge(. , winprobs_gy, all.x = TRUE) %>% 
-  as_tibble()
-
-
+# .....................................
 #.....................................
-#.....................................
-# farmer rank BradleyTerry ####
+# probabilities for each year ####
 
-# get a binomial rank
-B <- rank_binomial(YR, drop.null = TRUE)
+# split into seasons
+R <- split(gy, gy$year)
 
-mod <- BTm(cbind(win1, win2), player1, player2, ~ genotype,
-           id = "genotype", data = B)
+probs <- array(NA, dim = c(nrow(pars), 3, 3),
+               dimnames = list(pars$genotype, 
+                               c("genotype","pow_rank","season"),
+                               1:3))
+# run over years
+for(i in seq_along(R)) {
+  r <- rank_PL(data = R[[i]],
+               items = "genotype",
+               input = "gy_gm",
+               id = "id")
+  
+  mod <- PlackettLuce(r)
+  
+  p <- itempar(mod, log = FALSE)
+  
+  p <- as.matrix(p)
+  
+  probs[dimnames(p)[[1]], 2, i] <- p[,1]
+  
+  probs[,1,i] <- pars$genotype
+  
+  probs[, 3, i] <- names(R[i]) 
+  
+  
+}
 
+probs <- as_tibble(apply(probs, 2L, c))
 
-summary(mod)
+probs %<>% 
+  mutate(pow_rank = as.numeric(pow_rank))
 
-x <- coef(mod)
+probs <- bind_rows(pars, probs)
 
-names(x) <- gsub("genotype","",names(x))
+probs <- probs[probs$genotype %in% items, ]
 
-x <- tibble(genotype = names(x),
-            pow_gy_bt = x)
+probs %<>% 
+  group_by(genotype) %>% 
+  mutate(pow_rank = ifelse(is.na(pow_rank), mean(pow_rank, na.rm = TRUE), pow_rank)) %>% 
+  ungroup()
+
+probs %<>% 
+  group_by(season) %>% 
+  mutate(pow_rank = pow_rank / sum(pow_rank)) %>% 
+  ungroup()
+
+probs %<>% 
+  rename(pow_gy = pow_rank)
 
 winprobs %<>% 
-  merge(. , x, by = "genotype", all.x = TRUE) %>% 
-  as_tibble()
+  select(pow_rank) %>% 
+  bind_cols(. , probs) %>% 
+  select(genotype, season, pow_rank, pow_gy)
 
-winprobs %<>% 
-  mutate(pow_gy_bt = ifelse(is.na(pow_gy_bt),
-                            0,
-                            pow_gy_bt))
 
 
 write_csv(winprobs, paste0(output, "log-abilities.csv"))
 
 
 
-# ...................................
-# ...................................
-# farmer rank vs yield ####
-
-# yield rankings into a parsed matrix
-YR <- YR[1:length(YR),,as.grouped_rankings = FALSE]
-
-# farmer ranking into a PL object
-FR <- to_rankings(data = gy,
-                  items = "genotype",
-                  input = "farmer_rank",
-                  id = "id", 
-                  grouped.rankings = TRUE)
-
-# then into a parsed matrix 
-FR <- FR[1:length(FR), , as.grouped_rankings = FALSE]
-
-kendall <- kendallTau(FR, YR)
-
-write_csv(kendall, paste0(output, "kendall_correlation.csv"))
-
+# # ...................................
+# # ...................................
+# # farmer rank vs yield ####
+# 
+# # yield rankings into a parsed matrix
+# YR <- YR[1:length(YR),,as.grouped_rankings = FALSE]
+# 
+# # farmer ranking into a PL object
+# FR <- to_rankings(data = gy,
+#                   items = "genotype",
+#                   input = "farmer_rank",
+#                   id = "id", 
+#                   grouped.rankings = TRUE)
+# 
+# # then into a parsed matrix 
+# FR <- FR[1:length(FR), , as.grouped_rankings = FALSE]
+# 
+# kendall <- kendallTau(FR, YR)
+# 
+# write_csv(kendall, paste0(output, "kendall_correlation.csv"))
 # dimnames(R)[2]
 # 
 # adj <- PlackettLuce::adjacency(R)
