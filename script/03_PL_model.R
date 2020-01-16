@@ -25,11 +25,12 @@ rm(imputedcl, hmp)
 #.................................................
 #.................................................
 # PlackettLuce rankings ####
-G <- rank_PL(data = df,
-             items = "genotype",
-             input = "farmer_rank",
-             id = "id", 
-             grouped.rankings = TRUE)
+G <- rank_numeric(data = df,
+                  items = "genotype",
+                  input = "farmer_rank",
+                  id = "id", 
+                  ascending = TRUE,
+                  group = TRUE)
 
 #.................................................
 #.................................................
@@ -79,63 +80,61 @@ dir.create(output,
 
 # cross validation parameters
 n <- length(G)
-minsize <- 200 
+minsize <- round(n * 0.30, -2)
 npseudo <- 5
 alpha <- 0.01
 bonferroni <- TRUE
 gamma <- TRUE
-k <- 100
-set.seed(123)
-folds <- sample(rep(1:k, times = ceiling(n / k), length.out = n))
-keep <- which(grepl("DT_|NT_|lon|lat|xy|yx", names(ind)))
+folds <- as.numeric(as.factor(ind$year))
+k <- max(folds)
 
-data <- cbind(G, empty_model = rep(0, n), ind[keep])
+
+# select variables
+keep <- which(grepl("DT_|NT_|MLDS_rep|lon|lat|xy|yx", names(ind)))
+
+ind <- ind[, keep]
+
+# put all together as mydata
+mydata <- cbind(G, empty_model = rep(0, nrow(ind)), ind)
 
 #.................................................
 #.................................................
 # Model scenarios ####
-out <- c(19, 24, 29, 49)
 
 null <- crossvalidation(G ~ empty_model,
-                        data = data,
-                        drop.folds = out,
+                        data = mydata,
                         k = k,
                         folds = folds,
                         alpha = alpha)
 
-print(null)
+null
 
-env <- crossvalidation(G ~ minDT_veg + minNT_veg,
-                       data = data,
+env <- crossvalidation(G ~ minNT_veg + minNT_sow2rep + MLDS_rep,
+                       data = mydata,
                        k = k,
                        folds = folds,
-                       drop.folds = out,
                        minsize = minsize,
                        alpha = alpha)
 
-print(env)
 
-gen <- crossvalidation(G ~ minDT_veg + minNT_veg,
-                       data = data,
+gen <- crossvalidation(G ~ minNT_veg + minNT_sow2rep,
+                       data = mydata,
                        k = k,
                        folds = folds,
-                       drop.folds = out,
                        minsize = minsize,
                        alpha = alpha,
-                       gamma = gamma,
-                       normal = prior)
+                       normal = prior,
+                       gamma = gamma)
 
-print(gen)
 
 loc <- crossvalidation(G ~ lon + lat + xy + yx,
-                       data = data,
+                       data = mydata,
                        k = k,
                        folds = folds,
-                       drop.folds = out,
                        minsize = minsize,
                        alpha = alpha)
 
-print(loc)
+loc
 
 save(null, env, gen, loc,
      file = paste0(output, "models.rda"))

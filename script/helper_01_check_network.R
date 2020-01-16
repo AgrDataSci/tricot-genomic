@@ -11,8 +11,6 @@ df %<>%
   read_csv()
 
 
-table(df$accession, df$region)
-
 R <- rank_PL(data = df,
              items = "genotype",
              input = "farmer_rank",

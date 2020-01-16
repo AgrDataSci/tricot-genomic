@@ -4,7 +4,8 @@
 library("tidyverse")
 library("magrittr")
 library("janitor")
-library("ClimMobTools")
+library("gosset")
+library("chirps")
 library("caret")
 
 #.......................................
@@ -22,9 +23,6 @@ items <- unique(df$genotype)
 df %<>% 
   select(id, genotype, lat, lon, planting_date, year)
 
-
-#load("data/chirps.rda")
-#load("data/modis.rda")
 
 #......................................
 #......................................
@@ -107,7 +105,7 @@ span <-
 rain <- NULL
 for(i in seq_len(ncol(span))) {
 
-  r <- rainfall(df[c("lon","lat")],
+  r <- rainfall(df[,c("lon","lat")],
                 day.one = dates[[i]],
                 span = span[[i]])
 
@@ -142,6 +140,11 @@ for(i in seq_len(ncol(span))) {
 
 temp
 
+# check for -Inf values
+drop <- !apply(temp[1:ncol(temp)], 2, function(x) any(is.infinite(x)))
+drop <- as.vector(drop)
+
+temp <- temp[drop]
 
 # combine temperature and rainfall indices
 indices <- bind_cols(temp, rain)

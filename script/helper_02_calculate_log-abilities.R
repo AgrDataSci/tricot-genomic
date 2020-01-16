@@ -1,5 +1,5 @@
-# Get log abilities from PlackettLuce and Bradley-Terry models 
-# as a proxy for genomic prediction
+# Get log abilities from PlackettLuce model 
+# as an input for genomic prediction
 
 library("tidyverse")
 library("magrittr")
@@ -19,9 +19,14 @@ df %<>%
 output <- "output/log-abilities/"
 dir.create(output, recursive = TRUE, showWarnings = FALSE)
 
-items <- unique(df$genotype)
-items <- items[grepl("_D", items)]
 
+#.....................................
+#.....................................
+# Filter data ####
+# keep only genotyped assessions
+items <- unique(df$genotype)
+
+items <- items[grepl("_D", items)]
 
 df <- df[df$genotype %in% items, ]
 
@@ -41,16 +46,18 @@ df <- df[id,]
 
 #.....................................
 #.....................................
-# probabilities for all years ####
+# Compute probabilities for all years ####
+# on overall rank
 
-R <- rank_PL(data = df,
-             items = "genotype",
-             input = "farmer_rank",
-             id = "id")
+R <- rank_numeric(data = df,
+                  items = "genotype",
+                  input = "farmer_rank",
+                  id = "id",
+                  ascending = TRUE)
 
 mod <- PlackettLuce(R)
 
-pars <- itempar(mod, log = FALSE)
+pars <- coef(mod, log = FALSE)
 
 pars <- bind_cols(genotype = names(pars),
                   pow_rank = as.vector(pars),
@@ -70,14 +77,16 @@ probs <- array(NA, dim = c(nrow(pars), 3, 3),
                                1:3))
 # run over years
 for(i in seq_along(R)) {
-  r <- rank_PL(data = R[[i]],
-               items = "genotype",
-               input = "farmer_rank",
-               id = "id")
+  
+  r <- rank_numeric(data = R[[i]],
+                    items = "genotype",
+                    input = "farmer_rank", 
+                    id = "id",
+                    ascending = TRUE)
   
   mod <- PlackettLuce(r)
   
-  p <- itempar(mod, log = FALSE)
+  p <- coef(mod, log = FALSE)
   
   p <- as.matrix(p)
   
@@ -145,14 +154,15 @@ gy <- gy[id,]
 # ............................
 # ............................
 # all data 
-R <- rank_PL(data = gy,
-             items = "genotype",
-             input = "gy_gm",
-             id = "id")
+R <- rank_numeric(data = gy,
+                  items = "genotype",
+                  input = "gy_gm",
+                  id = "id",
+                  ascending = FALSE)
 
 mod <- PlackettLuce(R)
 
-pars <- itempar(mod, log = FALSE)
+pars <- coef(mod, log = FALSE)
 
 pars <- bind_cols(genotype = names(pars),
                   pow_rank = as.vector(pars),
@@ -173,14 +183,16 @@ probs <- array(NA, dim = c(nrow(pars), 3, 3),
                                1:3))
 # run over years
 for(i in seq_along(R)) {
-  r <- rank_PL(data = R[[i]],
-               items = "genotype",
-               input = "gy_gm",
-               id = "id")
+  
+  r <- rank_numeric(data = R[[i]],
+                    items = "genotype",
+                    input = "gy_gm",
+                    id = "id", 
+                    ascending = FALSE)
   
   mod <- PlackettLuce(r)
   
-  p <- itempar(mod, log = FALSE)
+  p <- coef(mod, log = FALSE)
   
   p <- as.matrix(p)
   
@@ -225,43 +237,4 @@ winprobs %<>%
 write_csv(winprobs, paste0(output, "log-abilities.csv"))
 
 
-
-# # ...................................
-# # ...................................
-# # farmer rank vs yield ####
-# 
-# # yield rankings into a parsed matrix
-# YR <- YR[1:length(YR),,as.grouped_rankings = FALSE]
-# 
-# # farmer ranking into a PL object
-# FR <- to_rankings(data = gy,
-#                   items = "genotype",
-#                   input = "farmer_rank",
-#                   id = "id", 
-#                   grouped.rankings = TRUE)
-# 
-# # then into a parsed matrix 
-# FR <- FR[1:length(FR), , as.grouped_rankings = FALSE]
-# 
-# kendall <- kendallTau(FR, YR)
-# 
-# write_csv(kendall, paste0(output, "kendall_correlation.csv"))
-# dimnames(R)[2]
-# 
-# adj <- PlackettLuce::adjacency(R)
-# 
-# adj <- as.vector(adj)
-# 
-# adj <- t(matrix(adj, nrow = ncol(R), ncol = ncol(R)))
-# 
-# dimnames(adj) <- list(dimnames(R)[[2]], dimnames(R)[[2]])
-# 
-# adj <- btdata(adj, return_graph = TRUE)
-# 
-# plot.igraph(adj$graph, vertex.size = 10, edge.arrow.size = 0.1)
-# 
-# 
-# mod <- PlackettLuce(R)
-# summary(mod)
-# plot(qvcalc(mod), las = 2, cex.axis = 0.7)
 

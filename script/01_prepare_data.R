@@ -7,165 +7,109 @@
 library("tidyverse")
 library("magrittr")
 library("janitor")
-library("sf")
 
-# ..........................................
-# ..........................................
-# file with some pre-debuged variables ####
-df <- "data/raw/DataSheet_CS_All_FINAL.csv"
-df %<>% 
-  read.csv(.,
-           na.strings = c("NA","", " ", "missing","?","#DIV/0!","#REF!")) %>% 
+
+#.....................................
+#.....................................
+
+# read csv file
+mydata <- read_csv("data/raw/climmob_ethiopia_2017.csv", 
+                   na = c("#VALUE!", "NA", "<NA>", ""),
+                   col_types = cols(GY_gm = col_number()))
+
+
+mydata %<>% 
   as_tibble(.name_repair = janitor::make_clean_names) %>%
   rename(lon = longtiude,
-         lat = latitude) %>% 
+         lat = latitude,
+         id = farmer_no) %>% 
   mutate_if(is.factor, as.character)
 
 
-# drop all missing rankings or rankings with missing accession
-df %<>%
-  filter(!is.na(farmer_rank) & !is.na(accession))
 
-# drop some variables
-names(df)
+# drop columns
+drop <- !grepl("code_", names(mydata))
 
-drop <- c("no","altitude","sex","code_accession","days2maturity")
+mydata <- mydata[, drop]
 
-drop <- !names(df) %in% drop
+drop <- c("no", "altitude", "sex", "days2maturity", "biomass_gm", "genotype")
 
-df <- df[drop]
+drop <- !names(mydata) %in% drop
 
+mydata <-  mydata[, drop]
+
+names(mydata)
+
+#.....................................
+#.....................................
+
+# change names of accessions
 # rename variety Hetosa and Assasa
-df %<>% 
+mydata %<>% 
   mutate(accession = ifelse(accession == "Hetosa",
                             "Hitosa", 
                             accession),
          accession = ifelse(accession == "Assassa",
                             "Asassa", 
                             accession))
-summary(as.factor(df$accession))
 
-# ..........................................
-# ..........................................
-# Debug lon lat data ####
-#lon lat 
-sum(is.na(df[,c("lon","lat")]))
+#.....................................
+#.....................................
 
-df %<>% 
-  mutate(lon = ifelse(is.na(lat), NA, lon),
-         lat = ifelse(is.na(lon), NA, lat))
+# drop all missing rankings or rankings with missing Accession (item id)
+mydata %<>%
+  filter(!is.na(farmer_rank) & !is.na(accession))
 
-# Download country border of ethiopia
-eth <-
-raster::getData("GADM", country = "ETH", path = "data", level = 0) %>% 
-  st_as_sf()
+# only keep strict rankings of four distinct items
+keep <- mydata %>%
+  group_by(id) %>%
+  summarise(keep = setequal(farmer_rank, 1:4) & n_distinct(accession) == 4) %>%
+  filter(keep)
 
-# plot(eth["GID_0"], col = "lightgrey")
-# 
-# df %>% 
-#   select(lon, lat) %>%  
-#   filter(!is.na(lon)) %>% 
-#   as.matrix() %>% 
-#   st_multipoint() %>%
-#   st_sfc(crs = st_crs(eth)) -> 
-#   lonlat
-# 
-# plot(eth["GID_0"], col = "lightgrey", reset = FALSE)
-# plot(lonlat, col = "blue", cex = 1, 
-#      bg = "Steelblue1", pch = 21, add = TRUE)
+keep <- mydata$id %in% keep$id
 
 
-# fill NAs using comunity centroid 
-summary(as.factor(df$kebele))
-varing <- as.vector(unique(df[["kebele"]]))
+mydata %<>% 
+  filter(keep)
 
-for (j in seq_along(varing)){
-  
-  print(varing[j])
-  
-  df %>% 
-    filter(kebele == varing[j]) %>% 
-    filter(!is.na(lon)) %>% 
-    mutate(z = lon + lat,
-           z = z - mean(z)) %>% 
-    select(lon, lat, z) ->
-    xyz
-  
-  # check which value is the closest to the mean
-  # and get the centroid
-  z <- xyz[which.min(abs(xyz$z)), c("lon","lat")]
-  
-  if(nrow(z) == 0) next
-  
-  df %<>% 
-    mutate(lon = ifelse(kebele == varing[j] & is.na(lon),
-                        z[[1,"lon"]],
-                        lon),
-           lat = ifelse(kebele == varing[j] & is.na(lat),
-                        z[[1,"lat"]],
-                        lat))
-}
 
-sum(is.na(df[,c("lon","lat")]))
 
-# debug lat and lon using mean per district
-varing <- as.vector(unique(df[["district"]]))
-for (j in seq_along(varing)){
-  
-  print(varing[j])
-  
-  df %>% 
-    filter(district == varing[j]) %>% 
-    filter(!is.na(lon)) %>% 
-    mutate(z = lon + lat,
-           z = z - mean(z)) %>% 
-    select(lon, lat, z) ->
-    xyz
-  
-  # check which value is the closest to the mean
-  # and get the centroid
-  z <- xyz[which.min(abs(xyz$z)), c("lon","lat")]
-  
-  if(nrow(z) == 0) next
-  
-  df %<>% 
-    mutate(lon = ifelse(district == varing[j] & is.na(lon),
-                        z[[1,"lon"]],
-                        lon),
-           lat = ifelse(district == varing[j] & is.na(lat),
-                        z[[1,"lat"]],
-                        lat))
-}
-
-sum(is.na(df[,c("lon","lat")]))
-
-df %>%
-  select(lon, lat) %>%
-  filter(!is.na(lon)) %>%
+# check the number of observations per variety
+# remove those tested in less than 20 farms 
+rmitem <- 
+  mydata %>% 
+  group_by(accession) %>%  
+  count(accession) %>%
+  filter(n < 20) %>%
+  dplyr::select(accession) %>%
   as.matrix() %>%
-  st_multipoint() %>%
-  st_sfc(crs = st_crs(eth)) ->
-  lonlat
+  as.vector()
 
-plot(eth["GID_0"], col = "lightgrey", reset = FALSE)
-plot(lonlat, col = "blue", cex = 1,
-     bg = "Steelblue1", pch = 21, add = TRUE)
 
-#.........................................
-#.........................................
-# Keep consistent observations #### 
+keep <- !mydata$accession %in% rmitem
 
-# out <- "data/raw/not_in_genotyping.csv"
-# out %<>% 
-#   read_csv() %>% 
-#   select(accession) %>% 
-#   t()
-# 
-# out <- !df$accession %in% out
-# 
-# # retain the observations with genotype data
-# df %<>% 
-#   filter(out)
+
+mydata <- mydata[keep, ]
+
+
+
+#.....................................
+#.....................................
+# remove rankings with less than 2 items
+mydata %>%
+  group_by(id) %>%
+  summarise(keep = n_distinct(accession) >= 2) %>%
+  filter(keep) ->
+  keep
+
+keep <- mydata$id %in% keep$id
+
+
+mydata %<>% 
+  filter(keep)
+
+#.....................................
+#.....................................
 
 # add genotype codes
 g <- "data/raw/whoiswho.diversity.panel.txt"
@@ -177,167 +121,102 @@ g %<>%
   filter(!grepl("_B", genotype))
 
 
-df %<>%
+mydata %<>%
   mutate(accession = tolower(accession)) %>% 
   merge(. , g, all.x = TRUE, by = "accession") %>% 
   as_tibble() 
 
-df %<>% 
+
+mydata %<>% 
   mutate(genotype = ifelse(is.na(genotype), accession, genotype))
 
-length(unique(df$accession)) == length(unique(df$genotype))
 
 
-# create an id for each plot and remove duplicates
-df %<>% 
-  mutate(plot_id = paste(genotype, farmer, year, sep = "-"),
-         id = as.integer(as.factor(farmer))) %>% 
-  arrange(id)
 
-# remove all entries that have duplicates 
-df <-
-  df[!(duplicated(df$plot_id) | duplicated(df$plot_id, fromLast = TRUE)), ]
-
-df %<>% 
-  group_by(id) %>% 
-  distinct(genotype, .keep_all = TRUE) %>% 
-  distinct(farmer_rank, .keep_all = TRUE) %>% 
-  as_tibble()
-
-# remove those tested in less than 10 farms 
-df %>% 
-  group_by(accession) %>%  
-  count(accession) %>%
-  filter(n < 10) %>%
-  select(accession) %>%
-  t() %>%
-  as.vector() ->
-  drop
-
-
-drop <- !df$accession %in% drop
-
-df %<>% 
-  filter(drop)
-
-
-# only keep strict rankings of at least 2 distinct items
-df %>%
-  group_by(id) %>%
-  summarise(keep = n_distinct(genotype) >= 2) %>%
-  filter(keep) ->
-  keep
-
-# apply the logical vector
-id <- df$id %in% keep$id
-
-# take rankings
-n <- nrow(keep)
-
-# keep selected observations
-df <- df[id,]
-
-df %<>% 
-  group_by(id) %>% 
-  mutate(plot_id = as.integer(as.factor(plot_id))) %>% 
-  as_tibble()
-
-# .......................................
-# .......................................
-# Fix planting dates ####
+#.....................................
+#.....................................
 # planting dates 
 
-df %>% 
-  select(sowing_date) %>% 
-  mutate(sowing_date = as.character(sowing_date)) ->
-  date
-
-date %<>% 
-  mutate(sowing_date = gsub("[/]|[.]","-", sowing_date)) %>% 
-  separate(., sowing_date, into = c("x","y","z"), sep = "-") %>% 
-  mutate_all(as.integer)
-
-summary(as.factor(date$x))
-summary(as.factor(date$y))
-summary(as.factor(date$z))
-
-# planting dates must be between month 7 and 8
-date %<>% 
-  mutate(y = ifelse(y < 7 , 8, y),
-         y = ifelse(y > 8, 8, y))
-
-summary(as.factor(date$x))
-summary(as.factor(date$y))
-summary(as.factor(date$z))
-
-date %<>% 
-  mutate(planting_date = ifelse(x > 2000, paste(x, y, z, sep = "-"),
-                                ifelse(z > 2000, paste(z, y, x, sep = "-"), NA)))
-
-df %<>% 
-  mutate(planting_date = date$planting_date,
-         planting_date = as.Date(planting_date, format = "%Y-%m-%d"), 
-         planting_date = as.integer(planting_date))
-
-summary(as.factor(df$planting_date))
+pdate <- read_csv("data/raw/ethiopia_planting_dates.csv")
+pdate %<>% 
+  as_tibble(.name_repair = janitor::make_clean_names) %>% 
+  mutate_if(is.factor, as.character)
 
 
-# fill missing planting dates with average per kebele and year
-df %<>% 
-  mutate(varing = ifelse(year == 2013, -365, 
-                         ifelse(year == 2015, 365, 0)))
 
+mydata <- merge(mydata, pdate[,c("farmer","planting_date")], 
+                by = "farmer", all.x = TRUE)
 
-df %>% 
-  select(planting_date, year) %>% 
-  filter(!is.na(planting_date), year == 2014) %>% 
-  summarise(mean =  mean(planting_date),
-            min = min(planting_date),
-            max = max(planting_date),
-            median = median(planting_date)) ->
-  varing
+mydata$planting_date <- as.Date(mydata$planting_date, "%d/%m/%Y")
 
+mydata$planting_date <- as.integer(mydata$planting_date)
 
-df_split <- split(df, df$id)
+# fill missing planting dates with average per year
+sum(is.na(mydata$planting_date))
 
-df_split <- lapply(df_split, function(X) {
-  i <- as.integer(rnorm(1, mean = varing$mean, sd = 10), origin = "1970-01-01")
-  i <- i + unique(X$varing)
+for(i in seq_along(unique(mydata$year))){
   
-  X$planting_date <- ifelse(is.na(X$planting_date), 
-                            i, X$planting_date)
+  y_i <- unique(mydata$year)[i]
   
-  X
-})
+  mydata$planting_date <- ifelse(is.na(mydata$planting_date) & mydata$year == y_i, 
+                                 mean(mydata$planting_date[mydata$year == y_i], na.rm=TRUE), 
+                                 mydata$planting_date)
+}
+
+mydata$planting_date <- as.Date(mydata$planting_date, origin = "1970-01-01")
+
+mydata$year <- as.integer(strftime(mydata$planting_date, "%Y"))
+
+sum(is.na(mydata$planting_date))
+
+#.....................................
+#.....................................
+# lon lat 
+sum(is.na(mydata[,c("lon","lat")]))
+
+# debug lat and lon using mean per village 
+summary(as.factor(mydata$kebele))
+
+for (j in unique(mydata[,"kebele"])){
+  
+  mydata[,"lon"] <- ifelse(mydata[,"kebele"] == j & is.na(mydata[,"lon"]),
+                           mean(mydata[,"lon"][mydata[,"kebele"] == j ], na.rm = TRUE),
+                           mydata[,"lon"])
+  
+  mydata[,"lat"] <- ifelse(mydata[,"kebele"] == j & is.na(mydata[,"lat"]),
+                           mean(mydata[,"lat"][mydata[,"kebele"] == j ], na.rm = TRUE),
+                           mydata[,"lat"])
+}
+
+sum(is.na(mydata[,c("lon","lat")]))
+
+# debug lat and lon using mean per district
+summary(mydata$district)
+for (j in unique(mydata[,"district"])){
+  mydata[,"lon"] <- ifelse(mydata[,"district"] == j & is.na(mydata[,"lon"]),
+                           mean(mydata[,"lon"][mydata[,"district"] == j ], na.rm = TRUE),
+                           mydata[,"lon"])
+  
+  mydata[,"lat"] <- ifelse(mydata[,"district"] == j & is.na(mydata[,"lat"]),
+                           mean(mydata[,"lat"][mydata[,"district"] == j ], na.rm = TRUE),
+                           mydata[,"lat"])
+}
+sum(is.na(mydata[,c("lon","lat")]))
 
 
-df <- bind_rows(df_split)
+# add season 
+mydata$season <- paste("Meher", mydata$year, sep="-")
+mydata$season <- gsub("20","",mydata$season)
 
 
-df %<>% 
-  mutate(planting_date = as.Date(planting_date, origin = "1970-01-01"),
-         year = as.integer(strftime(planting_date, "%Y"))) %>% 
-  select(-sowing_date, -varing)
+mydata <- as_tibble(mydata)
 
-sum(is.na(df$planting_date))
-
-plot(df$planting_date)
-
-
-# .......................................
-# .......................................
-# Check agronomic data ####
-
-# set as numeric
-df %<>% 
-  mutate(gy_gm = as.numeric(gy_gm),
-         biomass_gm = as.numeric(biomass_gm),
-         mean_seed_no_spike = as.numeric(mean_seed_no_spike),
-         mean_tn = as.numeric(mean_tn),
-         mean_sl = as.numeric(mean_sl))
+#.....................................
+#.....................................
+# check agronomic data
 
 # normalise by plot size
-df %<>% 
+mydata %<>% 
   mutate(gy_gm_raw = gy_gm,
          plot_size = ifelse(year == 2013 & region == "Tigray", 1.6,
                             ifelse(year == 2013 & region != "Tigray", 0.4,
@@ -345,25 +224,16 @@ df %<>%
                                           ifelse(year == 2015, 1.2, NA)))),
          gy_gm = gy_gm / plot_size)
 
-# mean tiller number
-boxplot(df$mean_tn ~ df$accession, las = 2)
-
-# mean seed per spike
-boxplot(df$mean_seed_no_spike ~ df$accession, las = 2)
-
-# mean spike length
-boxplot(df$mean_sl ~ df$accession, las = 2)
-
 # mean grain yield
-boxplot(df$gy_gm ~ df$accession, las = 2)
+boxplot(mydata$gy_gm ~ mydata$accession, las = 2)
 
 # remove outliers in these variables
-y <- split(df, df$accession)
+y <- split(mydata, mydata$accession)
 
 y <- lapply(y, function(x) {
-  i <- c("mean_tn","mean_seed_no_spike","mean_sl","gy_gm")
+  i <- c("gy_gm")
   x[,i] <- lapply(x[,i], function(z) {
-
+    
     out <- boxplot.stats(z)$out
     
     z <- ifelse(z %in% out, NA, z)
@@ -380,29 +250,31 @@ y <- lapply(y, function(x) {
 
 y <- bind_rows(y)
 
-boxplot(y$mean_tn ~ y$accession, las = 2)
-boxplot(y$mean_seed_no_spike ~ y$accession, las = 2)
-boxplot(y$mean_sl ~ y$accession, las = 2)
 boxplot(y$gy_gm ~ y$accession, las = 2)
 
-df <- y
+mydata <- y
 
-boxplot(df$gy_gm ~ df$accession, las = 2)
+boxplot(mydata$gy_gm ~ mydata$accession, las = 2)
 
-names(df)
+names(mydata)
 # organize colunm order
+mydata %<>% 
+  rename(plot_id = plot_no)
+
+
 first <- c("id","genotype","accession","plot_id","farmer")
 
-df <- df[c(match(first, names(df)),
-           which(!names(df) %in% first))] 
+mydata <- mydata[c(match(first, names(mydata)),
+                   which(!names(mydata) %in% first))] 
 
-df %<>% 
+mydata %<>% 
   arrange(id)
 
-drop <- c("zone","seedwt_500","biomass_gm","reseason_rank")
+drop <- c("farmer")
 
-df <- df[, !names(df) %in% drop]
+mydata <- mydata[, !names(mydata) %in% drop]
 
-write_csv(df, "data/durumwheat.csv")
+write_csv(mydata, "data/durumwheat.csv")
+
 
 
