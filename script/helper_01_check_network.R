@@ -11,10 +11,11 @@ df %<>%
   read_csv()
 
 
-R <- rank_PL(data = df,
-             items = "genotype",
-             input = "farmer_rank",
-             id = "id")
+R <- rank_numeric(data = df,
+                  items = "genotype",
+                  input = "farmer_rank",
+                  id = "id", 
+                  ascending = TRUE)
 
 
 adj <- adjacency(R)

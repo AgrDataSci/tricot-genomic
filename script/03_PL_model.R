@@ -55,11 +55,7 @@ am <- matrix(runif(73*ncol(gene), -1e-1, 1e-1),
              dimnames = list(items,
                              dimnames(gene)[[2]]))
 
-am[1:10, 1:10]
-
 am[genitems,] <- gene
-
-am[1:10, ]
 
 am <- t(am)
 
@@ -109,13 +105,14 @@ null <- crossvalidation(G ~ empty_model,
 
 null
 
-env <- crossvalidation(G ~ minNT_veg + minNT_sow2rep + MLDS_rep,
+env <- crossvalidation(G ~ minNT_veg + minNT_sow2rep,
                        data = mydata,
                        k = k,
                        folds = folds,
                        minsize = minsize,
                        alpha = alpha)
 
+env
 
 gen <- crossvalidation(G ~ minNT_veg + minNT_sow2rep,
                        data = mydata,
@@ -126,6 +123,7 @@ gen <- crossvalidation(G ~ minNT_veg + minNT_sow2rep,
                        normal = prior,
                        gamma = gamma)
 
+gen
 
 loc <- crossvalidation(G ~ lon + lat + xy + yx,
                        data = mydata,

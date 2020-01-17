@@ -19,13 +19,11 @@ mydata <- read_csv("data/raw/climmob_ethiopia_2017.csv",
 
 
 mydata %<>% 
-  as_tibble(.name_repair = janitor::make_clean_names) %>%
+  as_tibble(.name_repair = make_clean_names) %>%
   rename(lon = longtiude,
          lat = latitude,
-         id = farmer_no) %>% 
+         id  = farmer_no) %>% 
   mutate_if(is.factor, as.character)
-
-
 
 # drop columns
 drop <- !grepl("code_", names(mydata))
@@ -61,10 +59,11 @@ mydata %<>%
   filter(!is.na(farmer_rank) & !is.na(accession))
 
 # only keep strict rankings of four distinct items
-keep <- mydata %>%
+mydata %>%
   group_by(id) %>%
   summarise(keep = setequal(farmer_rank, 1:4) & n_distinct(accession) == 4) %>%
-  filter(keep)
+  filter(keep) ->
+  keep
 
 keep <- mydata$id %in% keep$id
 
@@ -75,12 +74,12 @@ mydata %<>%
 
 
 # check the number of observations per variety
-# remove those tested in less than 20 farms 
+# remove those tested in less than 10 farms 
 rmitem <- 
   mydata %>% 
   group_by(accession) %>%  
   count(accession) %>%
-  filter(n < 20) %>%
+  filter(n < 10) %>%
   dplyr::select(accession) %>%
   as.matrix() %>%
   as.vector()
@@ -122,7 +121,9 @@ g %<>%
 
 
 mydata %<>%
-  mutate(accession = tolower(accession)) %>% 
+  mutate(accession = tolower(accession))
+
+mydata %<>% 
   merge(. , g, all.x = TRUE, by = "accession") %>% 
   as_tibble() 
 
@@ -142,9 +143,7 @@ pdate %<>%
   as_tibble(.name_repair = janitor::make_clean_names) %>% 
   mutate_if(is.factor, as.character)
 
-
-
-mydata <- merge(mydata, pdate[,c("farmer","planting_date")], 
+mydata <- merge(mydata, pdate[,c("farmer","planting_date")],
                 by = "farmer", all.x = TRUE)
 
 mydata$planting_date <- as.Date(mydata$planting_date, "%d/%m/%Y")
@@ -276,5 +275,8 @@ mydata <- mydata[, !names(mydata) %in% drop]
 
 write_csv(mydata, "data/durumwheat.csv")
 
+
+
+rev(sort(table(mydata$id)))
 
 

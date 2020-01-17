@@ -515,7 +515,6 @@ Year,Region,Zone,District,Kebele,Farmer,lat,lon,planting_date
 2015,Tigray,NA,Lemeat,Medagolat,Kinfe Tewelde,NA,NA,2015-08-01
 2015,Tigray,NA,Lemeat,Medagolat,Mebrahtu Neguse,NA,NA,2015-08-01
 2015,Tigray,NA,Lemeat,Medagolat,G/micael G/medhin,NA,NA,2015-08-01
-2015,Tigray,NA,Lemeat,Medagolat,G/mariam G/hiwot,NA,NA,2015-08-01
 2015,Tigray,NA,Lemeat,Medagolat,Tekle Hailu,NA,NA,2015-08-01
 2015,Tigray,NA,Lemeat,Medagolat,Tsegay G/ezigizy,NA,NA,2015-08-01
 2015,Tigray,NA,Lemeat,Medagolat,W/mariam G/silassie,NA,NA,2015-08-01
@@ -828,7 +827,6 @@ Year,Region,Zone,District,Kebele,Farmer,lat,lon,planting_date
 2014,Amhara,NA,Meket,Weketa,Biks Adugna,NA,NA,2014-08-01
 2014,Amhara,NA,Meket,Weketa,Sisay Adal,NA,NA,2014-08-01
 2014,Amhara,NA,Meket,Weketa,Belaynewu Kasa,NA,NA,2014-08-01
-2014,Amhara,NA,Meket,Weketa,Fasika dagne,NA,NA,2014-08-01
 2014,Amhara,NA,Meket,Weketa,Habtam Abebe,11.70948,38.75632,2014-08-01
 2014,Amhara,NA,Meket,Weketa,Habtie Alene,NA,NA,2014-08-01
 2014,Amhara,NA,Meket,Weketa,Mebrie Fentie,NA,NA,2014-08-01
@@ -1142,3 +1140,77 @@ Year,Region,Zone,District,Kebele,Farmer,lat,lon,planting_date
 2014,Amhara,NA,Meket,Akat,Mebrate Mekonene,NA,NA,2014-08-01
 2014,Amhara,NA,Meket,Akat,Abate Demoze,NA,NA,2014-08-01
 2014,Amhara,NA,Meket,Akat,Kassa Getahun,11.67216,38.86727,2014-08-01
+2014,Oromia,,Moret and Jiru,Bolo,10000,,,2014-08-01
+2014,Oromia,,Moret and Jiru,Bolo,10002,,,2014-07-29
+2014,Oromia,,Moret and Jiru,Mangodo,10014,,,2014-08-05
+2014,Oromia,,Moret and Jiru,Mangodo,10016,,,2014-07-29
+2014,Oromia,,Seadebir and Wayo,Wole,10017,,,2014-08-02
+2014,Oromia,,Moret and Jiru,Mangodo,10031,,,2014-08-02
+2014,Oromia,,Moret and Jiru,Bolo,10037,,,2014-07-29
+2014,Oromia,,Moret and Jiru,Bolo,10054,,,2014-08-05
+2014,Amhara,,Meket,Hanamekuat,10073,,,2014-08-05
+2014,Oromia,,Moret and Jiru,Kusaye,10106,,,2014-07-29
+2014,Oromia,,Moret and Jiru,Kosiamba,10128,,,2014-07-31
+2014,Amhara,,Meket,Agrit,10142,,,2014-08-12
+2014,Amhara,,Meket,Hamusit,10158,,,2014-08-02
+2014,Amhara,,Meket,Aymat,10167,,,2014-07-25
+2014,Amhara,,Meket,Agrit,10207,,,2014-08-11
+2014,Amhara,,Meket,Hanamekuat,10214,,,2014-07-25
+2014,Amhara,,Meket,Weketa,10249,,,2014-08-07
+2014,Oromia,,Moret and Jiru,Kosiamba,10261,,,2014-08-04
+2014,Amhara,,Meket,Hanamekuat,10298,,,2014-07-09
+2014,Amhara,,Meket,Hanamekuat,10310,,,2014-07-29
+2014,Oromia,,Moret and Jiru,Weyn amba,10322,,,2014-07-29
+2014,Oromia,,Seadebir and Wayo,Dire,10351,,,2014-08-04
+2014,Amhara,,Meket,Hanamekuat,10352,,,2014-07-28
+2014,Oromia,,Moret and Jiru,Weyn amba,10355,,,2014-08-01
+2014,Oromia,,Moret and Jiru,Kusaye,10363,,,2014-08-01
+2014,Oromia,,Seadebir and Wayo,Kubeti,10409,,,2014-07-29
+2014,Amhara,,Meket,Timtimat,10430,,,2014-08-12
+2014,Amhara,,Meket,Weketa,10435,,,2014-08-11
+2014,Amhara,,Meket,Hanamekuat,10450,,,2014-08-10
+2014,Amhara,,Meket,Timtimat,10456,,,2014-08-03
+2014,Amhara,,Wadla,Yedogit,10565,,,2014-08-18
+2014,Oromia,,Seadebir and Wayo,Kubeti,10593,,,2014-08-02
+2014,Amhara,,Meket,Agrit,10619,,,2014-07-30
+2014,Amhara,,Meket,Hamusit,10656,,,2014-08-10
+2014,Amhara,,Meket,Hanamekuat,10676,,,2014-07-19
+2014,Oromia,,Moret and Jiru,Burtilik,10685,,,2014-08-04
+2014,Amhara,,Meket,Weketa,10707,,,2014-07-30
+2014,Amhara,,Meket,Werkaye,10725,,,2014-08-03
+2014,Amhara,,Meket,Werkaye,10798,,,2014-07-14
+2013,Amhara,,Meket,Akat,10805,,,2013-07-26
+2013,Amhara,,Meket,Weketa,10806,,,2013-08-16
+2014,Amhara,,Meket,Akat,10812,,,2014-08-06
+2014,Amhara,,Meket,Weketa,10815,,,2014-07-18
+2014,Amhara,,Meket,Timtimat,10830,,,2014-07-29
+2014,Amhara,,Meket,Weketa,10834,,,2014-07-18
+2014,Oromia,,Moret and Jiru,Mangodo,10842,,,2014-07-25
+2014,Amhara,,Wadla,Gashena,10846,,,2014-07-27
+2014,Amhara,,Meket,Weketa,10851,,,2014-07-15
+2014,Oromia,,Seadebir and Wayo,Dire,10854,,,2014-07-29
+2014,Oromia,,Moret and Jiru,Kosiamba,10872,,,2014-07-29
+2014,Oromia,,Seadebir and Wayo,Wole,10880,,,2014-07-30
+2013,Amhara,,Meket,Weketa,10890,,,2013-08-06
+2014,Amhara,,Meket,Weketa,10891,,,2014-08-06
+2014,Oromia,,Moret and Jiru,Burtilik,10896,,,2014-08-01
+2014,Oromia,,Moret and Jiru,Weyn amba,10954,,,2014-08-15
+2013,Amhara,,Meket,Weketa,10999,,,2013-08-07
+2014,Oromia,,Moret and Jiru,Kosiamba,11002,,,2014-07-29
+2014,Oromia,,Moret and Jiru,Kusaye,11023,,,2014-08-06
+2014,Amhara,,Meket,Hanamekuat,11040,,,2014-07-21
+2014,Amhara,,Meket,Agrit,11043,,,2014-07-13
+2014,Amhara,,Meket,Werkaye,11078,,,2014-08-11
+2014,Amhara,,Meket,Timtimat,11080,,,2014-07-22
+2014,Amhara,,Meket,Werkaye,11099,,,2014-08-10
+2014,Amhara,,Meket,Agrit,11105,,,2014-08-06
+2014,Oromia,,Seadebir and Wayo,Wole,11107,,,2014-08-05
+2014,Amhara,,Meket,Agrit,11130,,,2014-08-01
+2014,Amhara,,Meket,Werkaye,11133,,,2014-08-02
+2014,Amhara,,Meket,Hamusit,11144,,,2014-07-26
+2014,Oromia,,Moret and Jiru,Burtilik,11146,,,2014-08-16
+2014,Oromia,,Seadebir and Wayo,Kubeti,11162,,,2014-08-02
+2014,Amhara,,Meket,Timtimat,11185,,,2014-07-14
+2014,Amhara,,Meket,Hanamekuat,11192,,,2014-07-23
+2014,Amhara,,Meket,Agrit,11193,,,2014-08-11
+2014,Amhara,,Meket,Werkaye,11197,,,2014-08-05
