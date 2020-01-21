@@ -1,0 +1,32 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<svg xmlns='http://www.w3.org/2000/svg' xmlns:xlink='http://www.w3.org/1999/xlink' viewBox='0 0 311.81 311.81'>
+<defs>
+  <style type='text/css'><![CDATA[
+    line, polyline, polygon, path, rect, circle {
+      fill: none;
+      stroke: #000000;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-miterlimit: 10.00;
+    }
+  ]]></style>
+</defs>
+<rect width='100%' height='100%' style='stroke: none; fill: #FFFFFF;'/>
+<defs>
+  <clipPath id='cpMC4wMHwzMTEuODF8Mjg3LjYyfDAuMDA='>
+    <rect x='0.00' y='0.00' width='311.81' height='287.62' />
+  </clipPath>
+</defs>
+<g clip-path='url(#cpMC4wMHwzMTEuODF8Mjg3LjYyfDAuMDA=)'><image width='283.46' height='261.47' x='14.17' y='13.07' xlink:href='data:image/png;base64,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'/></g>
+<defs>
+  <clipPath id='cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA='>
+    <rect x='0.00' y='0.00' width='311.81' height='311.81' />
+  </clipPath>
+</defs>
+<rect x='43.45' y='293.29' width='17.28' height='18.53' style='stroke-width: 0.75; stroke: none; fill: #2C7BB6;' clip-path='url(#cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA=)' />
+<rect x='121.70' y='293.29' width='17.28' height='18.53' style='stroke-width: 0.75; stroke: none; fill: #FEE090;' clip-path='url(#cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA=)' />
+<rect x='199.96' y='293.29' width='17.28' height='18.53' style='stroke-width: 0.75; stroke: none; fill: #D73027;' clip-path='url(#cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA=)' />
+<g clip-path='url(#cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA=)'><text x='66.21' y='309.71' style='font-size: 20.00px; font-family: Arial;' textLength='50.02px' lengthAdjust='spacingAndGlyphs'>Var A</text></g>
+<g clip-path='url(#cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA=)'><text x='144.46' y='309.71' style='font-size: 20.00px; font-family: Arial;' textLength='50.02px' lengthAdjust='spacingAndGlyphs'>Var B</text></g>
+<g clip-path='url(#cpMC4wMHwzMTEuODF8MzExLjgxfDAuMDA=)'><text x='222.72' y='309.71' style='font-size: 20.00px; font-family: Arial;' textLength='51.12px' lengthAdjust='spacingAndGlyphs'>Var C</text></g>
+</svg>
