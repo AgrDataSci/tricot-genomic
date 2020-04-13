@@ -1,7 +1,6 @@
 # Write maps used in the illustration of Fig 01.
 #...............................................
 #...............................................
-
 library("raster")
 library("sf")
 library("ggplot2")
@@ -35,6 +34,7 @@ p <- ggplot(l) +
         legend.title = element_blank(),
         legend.text= element_text(size = 20, colour="black"))
 
+p
 
 ggsave("output/fig1/centralized.svg", 
        plot = p,
@@ -50,7 +50,13 @@ d <- raster("data/fig1.tif")
 
 d <- crop(d, e)
 
+plot(d)
+
 d <- as.data.frame(d, xy = TRUE)
+
+quantile(d[,3])
+
+summary(as.factor(d[,3]))
 
 d <- d[!is.na(d$fig1), ]
 
@@ -68,7 +74,7 @@ p2 <-
         legend.title = element_blank(),
         legend.text= element_text(size = 20, colour="black"))
 
-
+p2
 ggsave("output/fig1/decentralized.svg", 
        plot = p2,
        width = 11,

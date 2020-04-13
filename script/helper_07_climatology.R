@@ -26,9 +26,6 @@ items <- unique(df$genotype)
 df %<>% 
   dplyr::select(id, genotype, lat, lon, planting_date, year)
 
-
-
-
 #......................................
 #......................................
 # Define time span for phenological stages ####
@@ -46,8 +43,6 @@ ts <-
   summarise(db = as.integer(median(db, na.rm = TRUE)),
             df = as.integer(median(df, na.rm = TRUE)),
             dm = as.integer(median(dm, na.rm = TRUE)))
-
-
 span <- 
   ts %>% 
   mutate(veg = db,
@@ -56,20 +51,6 @@ span <-
          sow2rep = df,
          sow2gra = dm) %>% 
   dplyr::select(-db, -df, -dm)
-
-
-
-# # Dates for booting, flowering and maturity
-# dates <- 
-#   df %>% 
-#   select(planting_date, db, df, dm) %>% 
-#   mutate(veg = planting_date,
-#          rep = (planting_date + db) -8,
-#          gra = planting_date + df,
-#          sow2rep = planting_date,
-#          sow2gra = planting_date) %>% 
-#   select(-planting_date, -db, -df, -dm)
-
 
 #......................................
 #......................................
@@ -110,7 +91,6 @@ set.seed(345)
 s <- sample(1:nrow(coord), 1200)
 
 coord <- coord[s, ]
-
 
 #......................................
 #......................................

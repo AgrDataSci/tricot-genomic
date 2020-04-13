@@ -41,7 +41,7 @@ data <- cbind(G, ind[keep])
 
 n <- nrow(data)
 
-fit <- pltree(G ~ minDT_veg + minNT_veg,
+fit <- pltree(G ~  minNT_veg + maxNT_rep,
               data = data,
               npseudo = 5,
               gamma = TRUE, 
