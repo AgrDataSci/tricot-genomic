@@ -4,7 +4,6 @@
 library("raster")
 library("sf")
 library("ggplot2")
-library("svglite")
 
 #...............................................
 #...............................................
@@ -24,10 +23,11 @@ l <- st_as_sf(l)
 
 l$NAME_1 <- c("Var A", "Var A", "Var B")
 
+colors <- c("#ef8a62", "#2166ac","#fee090","#67a9cf")
 p <- ggplot(l) +
-  geom_sf(aes(fill = as.factor(l$NAME_1)),
+  geom_sf(aes(fill = as.factor(NAME_1)),
           lwd = 0) + 
-  scale_fill_manual(values = c("#2c7bb6", "#fee090"),
+  scale_fill_manual(values = colors,
                     labels = c("Var A", "Var B")) +
   theme_void() +
   theme(legend.position="bottom",
@@ -52,9 +52,34 @@ d <- crop(d, e)
 
 plot(d)
 
+
+# replace some values
+extf <- extent(c(-86,-85.65,12.8,13.14))
+extf2 <- extent(c(-85.8,-85.42,13.25,13.42))
+extf3 <- extent(c(-85.5,-85.40,13.13,13.25))
+extf4 <- extent(c(-85.7,-85.41,12.8,12.9))
+plot(d)
+plot(extf, add = TRUE)
+plot(extf2, add = TRUE)
+plot(extf3, add = TRUE)
+plot(extf4, add = TRUE)
+# Change values
+d[extf][d[extf] == 3] <- 4
+d[extf][d[extf] == 1] <- 4
+
+d[extf2][d[extf2] == 2] <- 1
+
+d[extf3][d[extf3] == 1] <- 2
+d[extf3][d[extf3] == 3] <- 2
+
+d[extf4][d[extf4] == 1] <- 4
+d[extf4][d[extf4] == 3] <- 4
+
+plot(d)
+
 d <- as.data.frame(d, xy = TRUE)
 
-quantile(d[,3])
+unique(d[,3])
 
 summary(as.factor(d[,3]))
 
@@ -62,13 +87,15 @@ d <- d[!is.na(d$fig1), ]
 
 head(d)
 
+colors <- c("#ef8a62", "#2166ac","#fee090","#67a9cf")
+
 p2 <- 
   ggplot(d) + 
   geom_raster(aes(y = y, x = x, 
-                  fill = factor(fig1, levels = c("3","2","1")))) +
-  scale_fill_manual(values= c("#2c7bb6", "#fee090", "#d73027"),
+                  fill = factor(fig1, levels = c("1","4","3","2")))) +
+  scale_fill_manual(values= colors,
                     name = NULL,
-                    labels = c("Var A", "Var B", "Var C")) +
+                    labels = c("Var A", "Var B", "Var C", "Var D")) +
   theme_void() +
   theme(legend.position="bottom",
         legend.title = element_blank(),
