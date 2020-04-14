@@ -1,12 +1,17 @@
 # Add environmental variables using planting dates 
 # and lon lat
-
 library("tidyverse")
 library("magrittr")
 library("janitor")
 library("gosset")
-library("chirps")
+library("climatrends")
 library("caret")
+
+sessioninfo::session_info()
+# write session info
+capture.output(sessioninfo::session_info(),
+               file = "script/02_add_climate_indices_session_info.txt")
+
 
 #.......................................
 #.......................................
@@ -15,7 +20,7 @@ library("caret")
 df <- read_csv("data/durumwheat.csv")
 
 # station data
-load("data/diversity.panel.data.gp.Rdata")
+load("data/diversity.panel.data.gp.rda")
 rm(snp.pos, info, geno, farm)
 
 items <- unique(df$genotype)

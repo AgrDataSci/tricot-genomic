@@ -98,3 +98,6 @@ ggsave("output/SI/fig_s11_kendall_tau.png",
        units = "cm")
 
 
+# remove the layer file
+# this can be downloaded again from GADM
+file.remove("gadm36_ETH_1_sp.rds")
