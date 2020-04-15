@@ -26,7 +26,7 @@ l <- st_as_sf(l)
 
 l$NAME_1 <- c("Var A", "Var A", "Var B")
 
-colors <- c("#253dac","#70e072")
+colors <- c("#2c7bb6", "#fee090")
 
 p <- ggplot(l) +
   geom_sf(aes(fill = as.factor(NAME_1)),
@@ -117,10 +117,7 @@ s <- smooth(s, method = "chaikin", refinements = 1)
 s <- smooth(s, method = "ksmooth", smoothness = 1)
 plot(s)
 
-colors <- c("#253dac",
-            "#70e072",
-            "#f1c73e",
-            "#2a4d0c")
+colors <- c("#2c7bb6", "#fee090", "#d73027","#80cdc1")
 #colors <- sample(colors, 4)
 
 p2 <- 

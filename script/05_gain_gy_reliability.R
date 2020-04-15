@@ -11,7 +11,8 @@ source("script/helper_00_functions.R")
 # ......................................
 # .....................................
 # Output dir
-output <- "output/reliability_yield_gain/"
+#output <- "output/reliability_yield_gain/"
+output <- "manuscript/display_items/"
 dir.create(output,
            showWarnings = FALSE,
            recursive = TRUE)
@@ -22,7 +23,7 @@ dir.create(output,
 df <- read_csv("data/durumwheat.csv")
 
 # yield from station data
-load("data/diversity.panel.data.gp.Rdata")
+load("data/diversity.panel.data.gp.rda")
 rm(snp.pos, geno, info, farm)
 
 # climatology
@@ -87,8 +88,9 @@ pr2 <- tibble(value = pr2,
 pr2
 
 p1 <- ggplot(pr2,
-             aes(y = value, group = model, x = model)) +
-  geom_boxplot(outlier.size = 0.5, size = 0.3) +
+             aes(y = value, group = model, x = model, fill = model)) +
+  geom_boxplot(outlier.size = 0.5, size = 0.3, show.legend = FALSE) + 
+  scale_fill_manual(values= c("#d73027","#2166ac")) +
   labs(y = bquote('Pseudo-R' ^2*''),
        x = "",
        title = "A") +
@@ -184,8 +186,10 @@ table(rel$gen)
 rel$best <- as.factor(ifelse(rel$best == 1, "1st", ifelse(rel$best == 2, "2nd", "3rd")))
 
 p2 <- ggplot(rel,
-             aes(y = reliability, group = best, x = best)) +
-  geom_boxplot(outlier.size = 0.5) +
+             aes(y = reliability, group = best, 
+                 x = best, fill = best)) +
+  geom_boxplot(outlier.size = 0.5, show.legend = FALSE) +
+  scale_fill_manual(values= c("#2166ac","#6baed6","#9ecae1")) + 
   labs(y = "Reliability",
        x = c(""),
        title = "B") +
@@ -226,8 +230,8 @@ p2
 # 
 # # 
 # save(gen_gy, loc_gy, env_gy, baseline, gy, output,
-#      file = paste0(output, "predictions.rda"))
-load(paste0(output, "predictions-100-fold.rda"))
+#      file = paste0("output/reliability_yield_gain/", "predictions.rda"))
+load(paste0("output/reliability_yield_gain/", "predictions-100-fold.rda"))
 
 year <- rep(1:15, each = length(loc_gy)*3)
 
@@ -271,12 +275,12 @@ p3 <-
   geom_errorbar(aes(ymin = se_min, ymax = se_max), 
                 width = .1,
                 position = position_dodge(1)) +
-  scale_y_continuous(limits = c(0, 0.3),
-                     breaks = seq(0, 3, 0.5)/10 ) +
+  scale_y_continuous(limits = c(0, 0.35),
+                     breaks = seq(0, 3.5, 0.5)/10 ) +
   labs(y = "Increase in yield (%)",
        x = "Year",
        title = "C") +
-  scale_fill_manual(values = c("#08519c"), 
+  scale_fill_manual(values = c("#3182bd"), 
                       name = "") +
   theme(axis.text.x = element_text(size=12, angle = 0,
                                    face="plain", colour = "black"),
@@ -308,14 +312,14 @@ p <- (p1 | p2) / p3
 p
 
 # save as svg
-ggsave(paste0(output, "Fig2.svg"),
+ggsave(paste0("manuscript/display_items/", "Fig2.svg"),
        plot = p,
        width = 15,
        height = 15,
        units = "cm")
 
 # save as png
-ggsave(paste0(paste0(output, "Fig2.png")),
+ggsave(paste0(paste0("manuscript/display_items/", "Fig2.png")),
        plot = p,
        width = 15,
        height = 15,
