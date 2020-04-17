@@ -10,7 +10,7 @@ library("caret")
 sessioninfo::session_info()
 # write session info
 capture.output(sessioninfo::session_info(),
-               file = "script/02_add_climate_indices_session_info.txt")
+               file = "script/session_info/02_add_climate_indices_session_info.txt")
 
 
 #.......................................

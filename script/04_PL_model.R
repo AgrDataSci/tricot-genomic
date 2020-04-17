@@ -8,6 +8,11 @@ library("gosset")
 library("patchwork")
 library("caret")
 
+sessioninfo::session_info()
+# write session info
+capture.output(sessioninfo::session_info(),
+               file = "script/session_info/04_PL_model_session_info.txt")
+
 #.................................................
 #.................................................
 # Data ####
@@ -103,20 +108,11 @@ keep <- which(grepl("DT_|NT_|MLDS_rep|lon|lat|xy|yx", names(ind)))
 ind <- ind[, keep]
 
 # put all together as mydata
-mydata <- cbind(G, empty_model = rep(0, nrow(ind)), ind)
+mydata <- cbind(G, ind)
 
 #.................................................
 #.................................................
-# Model scenarios ####
-null <- crossvalidation(G ~ empty_model,
-                        data = mydata,
-                        k = k,
-                        folds = folds,
-                        alpha = alpha)
-
-null
-
-
+# Model with OA ####
 gen <- crossvalidation(G ~ minNT_veg + maxNT_rep,
                        data = mydata,
                        k = k,
@@ -126,10 +122,6 @@ gen <- crossvalidation(G ~ minNT_veg + maxNT_rep,
                        normal = prior,
                        gamma = gamma)
 
-gen
-
-save(null, gen,
-     file = paste0(output, "models.rda"))
 
 # Look up for this using GY
 #...........................
@@ -159,10 +151,15 @@ gen_gy <- crossvalidation(GY ~ minNT_veg + maxNT_rep,
                           folds = folds_gy,
                           minsize = minsize,
                           alpha = alpha,
-                          normal = prior,
-                          gamma = gamma)
+                          normal = prior)
 
 
+
+save(gen_gy, gen,
+     file = paste0(output, "models.rda"))
+
+#......................................
+#......................................
 # now predict OA >> GY and GY >> OA
 source("script/helper_00_functions.R")
 

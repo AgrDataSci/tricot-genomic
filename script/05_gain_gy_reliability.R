@@ -8,6 +8,11 @@ library("PlackettLuce")
 
 source("script/helper_00_functions.R")
 
+sessioninfo::session_info()
+# write session info
+capture.output(sessioninfo::session_info(),
+               file = "script/session_info/05_gain_gy_reliability.txt")
+
 # ......................................
 # .....................................
 # Output dir
@@ -23,7 +28,7 @@ dir.create(output,
 df <- read_csv("data/durumwheat.csv")
 
 # yield from station data
-load("data/diversity.panel.data.gp.rda")
+load("data/diversity.panel.data.gp.Rdata")
 rm(snp.pos, geno, info, farm)
 
 # climatology
@@ -73,14 +78,15 @@ baseline <- mean(baseline[["gy"]])
 # ..............................
 # Pseudo R-squared boxplot ####
 load("processing/plmodels/models.rda")
-pr2 <- c(null$raw$estimators$MaxLik,
-         gen$raw$estimators$MaxLik)
+pr2 <- c(as.vector(unlist(gen_gy$raw$estimators[,7])),
+         as.vector(unlist(gen$raw$estimators$MaxLik)))
 
-model <- factor(rep(c("MCB","M3DB"), 
-                    each = length(null$raw$models)),
-                levels = c("MCB","M3DB"))
+model <- factor(rep(c("GY","OA"), 
+                    each = length(gen$raw$models)),
+                levels = c("GY","OA"))
 
 model
+pr2
 
 pr2 <- tibble(value = pr2,
               model = model)
@@ -94,16 +100,14 @@ p1 <- ggplot(pr2,
   labs(y = bquote('Pseudo-R' ^2*''),
        x = "",
        title = "A") +
-  scale_y_continuous(limits = c(0.4, 0.6),
-                     breaks =  seq(40,60, 5)/100) + 
-  scale_x_discrete(labels = c(MCB = "CB",
-                              M3DB = "3DB")) +
-  theme(axis.text.x = element_text(size = 14, angle = 0,
+  scale_y_continuous(limits = c(0.35, 0.6),
+                     breaks =  seq(35,60, 5)/100) +
+  theme(axis.text.x = element_text(size = 12, angle = 0,
                                    face = "plain", colour = "black"),
-        axis.text.y = element_text(size = 14, angle = 0,
+        axis.text.y = element_text(size = 12, angle = 0,
                                    hjust = 1, vjust = 0.5,
                                    face = "plain", colour = "black"),
-        axis.title.y = element_text(size = 14, colour = "black"),
+        axis.title.y = element_text(size = 12, colour = "black"),
         axis.line = element_line(colour = "black"),
         plot.background = element_blank(),
         panel.background = element_blank(),
@@ -190,17 +194,17 @@ p2 <- ggplot(rel,
                  x = best, fill = best)) +
   geom_boxplot(outlier.size = 0.5, show.legend = FALSE) +
   scale_fill_manual(values= c("#2166ac","#6baed6","#9ecae1")) + 
-  labs(y = "Reliability",
+  labs(y = "Probability of outperforming",
        x = c(""),
        title = "B") +
   scale_y_continuous(limits = c(.8, .95),
                      breaks = seq(8, 10, 0.5)/10) +
-  theme(axis.text.x = element_text(size=14, angle = 0,
+  theme(axis.text.x = element_text(size=12, angle = 0,
                                    face="plain", colour = "black"),
-        axis.text.y = element_text(size=14, angle = 0,
+        axis.text.y = element_text(size=12, angle = 0,
                                    hjust=1, vjust=0.5,
                                    face="plain", colour = "black"),
-        axis.title.y = element_text(size=14, colour = "black"),
+        axis.title.y = element_text(size=12, colour = "black"),
         axis.line = element_line(colour = "black"),
         plot.background = element_blank(),
         panel.background = element_blank(),
@@ -284,13 +288,13 @@ p3 <-
                       name = "") +
   theme(axis.text.x = element_text(size=12, angle = 0,
                                    face="plain", colour = "black"),
-        axis.title.x = element_text(size=14, colour = "black"),
-        axis.text.y = element_text(size=14, angle = 0,
+        axis.title.x = element_text(size=12, colour = "black"),
+        axis.text.y = element_text(size=12, angle = 0,
                                    hjust=1, vjust=0.5,
                                    face="plain", colour = "black"),
-        axis.title.y = element_text(size=14, colour = "black"),
+        axis.title.y = element_text(size=12, colour = "black"),
         axis.line = element_line(colour = "black"),
-        legend.text = element_text(size=14, colour="black"),
+        legend.text = element_text(size=12, colour="black"),
         legend.key = element_rect(colour = NA, fill = NA ,
                                   size=0.5,linetype = 1),
         #legend.background = element_rect(colour = NA, fill = NA),
