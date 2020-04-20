@@ -11,7 +11,7 @@ source("script/helper_00_functions.R")
 sessioninfo::session_info()
 # write session info
 capture.output(sessioninfo::session_info(),
-               file = "script/session_info/05_gain_gy_reliability.txt")
+               file = "script/session_info/05_make_fig2.txt")
 
 # ......................................
 # .....................................
@@ -74,55 +74,12 @@ baseline <- mean(baseline[["gy"]])
 # #.......................................
 # #.......................................
 # Plot results ####
-
 # ..............................
 # Pseudo R-squared boxplot ####
 load("processing/plmodels/models.rda")
-pr2 <- c(as.vector(unlist(gen_gy$raw$estimators[,7])),
-         as.vector(unlist(gen$raw$estimators$MaxLik)))
-
-model <- factor(rep(c("GY","OA"), 
-                    each = length(gen$raw$models)),
-                levels = c("GY","OA"))
-
-model
-pr2
-
-pr2 <- tibble(value = pr2,
-              model = model)
-
-pr2
-
-p1 <- ggplot(pr2,
-             aes(y = value, group = model, x = model, fill = model)) +
-  geom_boxplot(outlier.size = 0.5, size = 0.3, show.legend = FALSE) + 
-  scale_fill_manual(values= c("#d73027","#2166ac")) +
-  labs(y = bquote('Pseudo-R' ^2*''),
-       x = "",
-       title = "A") +
-  scale_y_continuous(limits = c(0.35, 0.6),
-                     breaks =  seq(35,60, 5)/100) +
-  theme(axis.text.x = element_text(size = 12, angle = 0,
-                                   face = "plain", colour = "black"),
-        axis.text.y = element_text(size = 12, angle = 0,
-                                   hjust = 1, vjust = 0.5,
-                                   face = "plain", colour = "black"),
-        axis.title.y = element_text(size = 12, colour = "black"),
-        axis.line = element_line(colour = "black"),
-        plot.background = element_blank(),
-        panel.background = element_blank(),
-        panel.border = element_rect(linetype = "solid",
-                                    fill = NA),
-        plot.margin = unit(c(3,3,1,3), "mm"),
-        plot.title = element_text(size=16, 
-                                  colour = "black", 
-                                  face = "bold"))
-p1
-
 # .............................................
 # .............................................
 # Reliability plot ####
-
 models <- gen$raw$models
 dt <- gen$raw$data
 n <- nrow(dt)
@@ -133,6 +90,8 @@ for (i in seq_along(models)) {
   x <- predict(models[[i]], newdata = dt)
   pr[,,i] <- x
 }
+
+
 # average them 
 pr <- apply(pr, c(1,2), mean)
 pr <- pr[,c(improved, accession)]
@@ -141,12 +100,23 @@ pr <- t(apply(pr, 1, function(x){
   x <- x / s
 }))
 
+# place predictions in a node
+nodes <- vector()
+for (i in seq_along(models)) {
+  x <- predict(models[[i]], newdata = dt, type = "node")
+  nodes <- cbind(nodes, x)
+}
+
+nodes <- ifelse(nodes[,1] == "2", "node 3",
+                ifelse(nodes[,1] == "3" & nodes[,3] == "2", "node 4",
+                       ifelse(nodes[,1] == "3" & nodes[,3] == "3", "node 5", NA)))
+
 # get the reference variety from each plot
 R <- dt$G
 R <- R[1:length(R),,as.grouped_rankings = FALSE]
 
 # define the number of best genotypes to compare with the reference
-nbest <- 3
+nbest <- 4
 
 # run over obs
 rel <- data.frame()
@@ -157,9 +127,9 @@ for(i in seq_len(n)) {
   x <- x[x!=0]
   f_impr <- improved[improved %in% names(x)]
   
-  if (length(f_impr)==0) next
+  if (length(f_impr) == 0) next
   
-  # get the best three but the reference 
+  # get the bests but the reference 
   y <- pr[i, ]
   p_impr <- y[f_impr]
   best <- y[!grepl(paste0(improved, collapse = "|"), names(y))]
@@ -176,7 +146,8 @@ for(i in seq_len(n)) {
                   best = 1:nbest,
                   ref = rep(names(p_impr), nbest),
                   gen = names(re),
-                  reliability = as.numeric(re))
+                  reliability = as.numeric(re), 
+                  node = rep(nodes[i], nbest))
   
   rel <- rbind(rel, d)
   
@@ -187,6 +158,12 @@ head(rel)
 table(rel$ref)
 table(rel$gen)
 
+node_sel <- cbind(table(rel$gen[rel$node=="node 3"]),
+                  table(rel$gen[rel$node=="node 4"]),
+                  table(rel$gen[rel$node=="node 5"]))
+dimnames(node_sel)
+
+rel <- rel[rel$best < 4, ]
 rel$best <- as.factor(ifelse(rel$best == 1, "1st", ifelse(rel$best == 2, "2nd", "3rd")))
 
 p2 <- ggplot(rel,
@@ -217,6 +194,51 @@ p2 <- ggplot(rel,
 
 p2
 
+
+# .....................................
+# Biplot 
+nodepca <- read.csv("output/reliability_yield_gain/node_gen.csv")
+dt <- nodepca
+
+nodesel <- data.frame(cbind(genotype = dimnames(node_sel)[[1]],
+                 group = c(rep("3DB Node3", 3), rep("3DB Node4", 3))),
+           stringsAsFactors = FALSE)
+
+pca <- merge(nodepca, nodesel, by = "genotype", all.x = TRUE)
+pca$group <- ifelse(pca$PC1 < - 100, "Currently recommended", pca$group) 
+pca$group <- ifelse(is.na(pca$group), "Other genotypes", pca$group) 
+pca$group <- factor(pca$group, levels = c("3DB Node3","3DB Node4","Currently recommended","Other genotypes"))
+
+p1<-
+ggplot() +
+  geom_point(data = pca, 
+             aes(x = PC1, y = PC2, fill = group, color = group), size = 1.5) +
+  scale_color_manual(values= c("#91c43e","#9f49c3","#e0493d","#b3b3b3")) +
+  labs(x = "PC1 (24.1%)",
+       y = "PC2 (10.5%)",
+       title = "A") +
+  theme_bw() +
+  theme(axis.text.x = element_text(size = 12, angle = 0,
+                                   face = "plain", colour = "black"),
+        axis.text.y = element_text(size = 12, angle = 0,
+                                   hjust = 1, vjust = 0.5,
+                                   face = "plain", colour = "black"),
+        axis.title.y = element_text(size = 12, colour = "black"),
+        panel.grid.minor = element_blank(),
+        legend.text = element_text(size = 8),
+        legend.title = element_blank(),
+        legend.position = c(0.35,0.87),
+        legend.background = element_blank(),
+        legend.key.size = unit(0.3, "cm"),
+        panel.grid.major = element_blank(),
+        panel.border = element_rect(linetype = "solid",
+                                    fill = NA),
+        plot.margin = unit(c(3,3,1,3), "mm"),
+        plot.title = element_text(size = 16, 
+                                  colour = "black", 
+                                  face = "bold"))
+
+p1
 # .................................
 # Bar plot over the time series ####
 # # Gain 
@@ -327,4 +349,6 @@ ggsave(paste0(paste0("manuscript/display_items/", "Fig2.png")),
        plot = p,
        width = 15,
        height = 15,
+       dpi = 500,
        units = "cm")
+
