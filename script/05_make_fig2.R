@@ -79,7 +79,7 @@ baseline <- mean(baseline[["gy"]])
 load("processing/plmodels/models.rda")
 # .............................................
 # .............................................
-# Reliability plot ####
+# Panel B, Reliability ####
 models <- gen$raw$models
 dt <- gen$raw$data
 n <- nrow(dt)
@@ -164,7 +164,9 @@ node_sel <- cbind(table(rel$gen[rel$node=="node 3"]),
 dimnames(node_sel)
 
 rel <- rel[rel$best < 4, ]
-rel$best <- as.factor(ifelse(rel$best == 1, "1st", ifelse(rel$best == 2, "2nd", "3rd")))
+rel$best <- as.factor(ifelse(rel$best == 1, "1st",
+                             ifelse(rel$best == 2,
+                                    "2nd", "3rd")))
 
 p2 <- ggplot(rel,
              aes(y = reliability, group = best, 
@@ -190,30 +192,35 @@ p2 <- ggplot(rel,
         plot.margin = unit(c(3,3,1,3), "mm"),
         plot.title = element_text(size=16, 
                                   colour = "black", 
-                                  face = "bold"))
+                                  face = "bold"),
+        text = element_text(family = "sans"))
 
 p2
 
 
 # .....................................
-# Biplot 
+# .....................................
+# Panel A, Biplot ####
 nodepca <- read.csv("output/reliability_yield_gain/node_gen.csv")
 dt <- nodepca
 
 nodesel <- data.frame(cbind(genotype = dimnames(node_sel)[[1]],
-                 group = c(rep("3DB Node3", 3), rep("3DB Node4", 3))),
+                 group = c(rep("3DB Cold tolerant", 3), rep("3DB Warm tolerant", 3))),
            stringsAsFactors = FALSE)
 
 pca <- merge(nodepca, nodesel, by = "genotype", all.x = TRUE)
 pca$group <- ifelse(pca$PC1 < - 100, "Currently recommended", pca$group) 
 pca$group <- ifelse(is.na(pca$group), "Other genotypes", pca$group) 
-pca$group <- factor(pca$group, levels = c("3DB Node3","3DB Node4","Currently recommended","Other genotypes"))
+pca$group <- factor(pca$group, levels = c("3DB Cold tolerant","3DB Warm tolerant",
+                                          "Currently recommended","Other genotypes"))
 
 p1<-
 ggplot() +
   geom_point(data = pca, 
-             aes(x = PC1, y = PC2, fill = group, color = group), size = 1.5) +
-  scale_color_manual(values= c("#91c43e","#9f49c3","#e0493d","#b3b3b3")) +
+             aes(x = PC1, y = PC2, fill = group, 
+                 color = group, shape = group), size = 1.5) +
+  scale_shape_manual(values = c(15, 16, 17, 5)) +
+  scale_color_manual(values= c("#91c43e","#9f49c3","#e0493d","gray40")) +
   labs(x = "PC1 (24.1%)",
        y = "PC2 (10.5%)",
        title = "A") +
@@ -225,9 +232,9 @@ ggplot() +
                                    face = "plain", colour = "black"),
         axis.title.y = element_text(size = 12, colour = "black"),
         panel.grid.minor = element_blank(),
-        legend.text = element_text(size = 8),
+        legend.text = element_text(size = 10),
         legend.title = element_blank(),
-        legend.position = c(0.35,0.87),
+        legend.position = c(0.25,0.9),
         legend.background = element_blank(),
         legend.key.size = unit(0.3, "cm"),
         panel.grid.major = element_blank(),
@@ -236,11 +243,12 @@ ggplot() +
         plot.margin = unit(c(3,3,1,3), "mm"),
         plot.title = element_text(size = 16, 
                                   colour = "black", 
-                                  face = "bold"))
+                                  face = "bold"),
+        text = element_text(family = "sans"))
 
 p1
 # .................................
-# Bar plot over the time series ####
+# Panel C, Bar plot over the time series ####
 # # Gain 
 # # gy by taking the best three varieties from Plackett-Luce models
 # gen_gy <- NULL
@@ -251,64 +259,73 @@ p1
 #   y <- data.frame(y = y, sample = paste0("S",i), r = 1:length(y))
 #   gen_gy <- rbind(gen_gy, y)
 # }
-# 
-# 
-# 
-# # 
 # save(gen_gy, loc_gy, env_gy, baseline, gy, output,
 #      file = paste0("output/reliability_yield_gain/", "predictions.rda"))
-load(paste0("output/reliability_yield_gain/", "predictions-100-fold.rda"))
+# load(paste0("output/reliability_yield_gain/", "predictions-100-fold.rda"))
+# 
+# year <- rep(1:15, each = length(loc_gy)*3)
+# 
+# year <- factor(year, levels = 1:15)
 
-year <- rep(1:15, each = length(loc_gy)*3)
+# gen_gy$year <- year
+# env_gy$year <- year
+# 
+# yield <- bind_rows(env_gy, gen_gy)
+# 
+# yield$model <- factor(rep(c("ME","M3DB"), each = nrow(env_gy)), 
+#                       levels = c("ME","M3DB"))
+# 
+# 
+# yield %<>% 
+#   mutate(gain = y / baseline -1)
+# 
+# e <- split(yield, yield$model)
+# e <- lapply(e, function(x){
+#   g <- glm(gain ~ year, data = x, family = poisson())
+#   g <- sqrt(diag(vcov(g)))
+#   as.vector(g)
+# })
+# 
+# yield %<>% 
+#   group_by(model, year) %>% 
+#   summarise(gain = mean(gain)) %>% 
+#   ungroup() %>% 
+#   mutate(se = as.vector(unlist(e))) %>% 
+#   filter(model == "M3DB")
+# 
+# yield %<>% 
+#   mutate(se_min = gain - se,
+#          se_max = gain + se)
+# 
+# write.csv(yield, "output/reliability_yield_gain/yield_gain.csv", row.names = FALSE)
 
-year <- factor(year, levels = 1:15)
+yield <- read_csv("output/reliability_yield_gain/yield_gain.csv")
 
-
-gen_gy$year <- year
-env_gy$year <- year
-
-yield <- bind_rows(env_gy, gen_gy)
-
-yield$model <- factor(rep(c("ME","M3DB"), each = nrow(env_gy)), 
-                      levels = c("ME","M3DB"))
-
-
-yield %<>% 
-  mutate(gain = y / baseline -1)
-
-e <- split(yield, yield$model)
-e <- lapply(e, function(x){
-  g <- glm(gain ~ year, data = x, family = poisson())
-  g <- sqrt(diag(vcov(g)))
-  as.vector(g)
-})
-
-yield %<>% 
-  group_by(model, year) %>% 
-  summarise(gain = mean(gain)) %>% 
-  ungroup() %>% 
-  mutate(se = as.vector(unlist(e))) %>% 
-  filter(model == "M3DB")
-
-yield %<>% 
-  mutate(se_min = gain - se,
-         se_max = gain + se)
+every_n_labeler <- function(n = 3) {
+  function (x) {
+    ind = ((1:length(x)) - 1) %% n == 0
+    x[!ind] = ""
+    return(x)
+  }
+}
 
 p3 <- 
   ggplot(yield, aes(y = gain, x = year, fill = model)) +
   geom_bar(stat = "identity",
            position = position_dodge()) +
   geom_errorbar(aes(ymin = se_min, ymax = se_max), 
-                width = .1,
+                width = 0.1,
                 position = position_dodge(1)) +
+  scale_x_discrete(breaks = seq(1,15,2)) +
   scale_y_continuous(limits = c(0, 0.35),
-                     breaks = seq(0, 3.5, 0.5)/10 ) +
+                     breaks = seq(0, 3.5, 0.5)/10,
+                     expand = c(0, 0)) +
   labs(y = "Increase in yield (%)",
        x = "Year",
        title = "C") +
   scale_fill_manual(values = c("#3182bd"), 
                       name = "") +
-  theme(axis.text.x = element_text(size=12, angle = 0,
+  theme(axis.text.x = element_text(size = 12, angle = 0,
                                    face="plain", colour = "black"),
         axis.title.x = element_text(size=12, colour = "black"),
         axis.text.y = element_text(size=12, angle = 0,
@@ -319,8 +336,6 @@ p3 <-
         legend.text = element_text(size=12, colour="black"),
         legend.key = element_rect(colour = NA, fill = NA ,
                                   size=0.5,linetype = 1),
-        #legend.background = element_rect(colour = NA, fill = NA),
-        #legend.justification = c(1, 0), 
         legend.position = "none",
         plot.background = element_blank(),
         panel.background = element_blank(),
@@ -329,25 +344,24 @@ p3 <-
         plot.margin = unit(c(2,3,3,3), "mm"),
         plot.title = element_text(size=16, 
                                   colour = "black", 
-                                  face = "bold"))
+                                  face = "bold"),
+        text = element_text(family = "sans"))
 
 p3
 
-p <- (p1 | p2) / p3
-
-p
+p <- p1 + (p2 / p3) + plot_layout(ncol = 2, widths = c(2, 1))
 
 # save as svg
 ggsave(paste0("manuscript/display_items/", "Fig2.svg"),
        plot = p,
-       width = 15,
+       width = 20,
        height = 15,
        units = "cm")
 
 # save as png
 ggsave(paste0(paste0("manuscript/display_items/", "Fig2.png")),
        plot = p,
-       width = 15,
+       width = 20,
        height = 15,
        dpi = 500,
        units = "cm")
