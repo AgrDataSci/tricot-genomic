@@ -33,10 +33,11 @@ load("data/diversity.panel.data.gp.Rdata")
 rm(snp.pos, geno, info, farm)
 
 # climatology
-load("processing/climatology/climatology.rda")
+# load("processing/climatology/climatology.rda")
 
 # PL models
-load("processing/plmodels/models-100-fold.rda")
+load("processing/plmodels/models.rda")
+# load("processing/plmodels/models-100-fold.rda")
 
 # varieties' names
 items <- unique(df$genotype)
@@ -77,7 +78,6 @@ baseline <- mean(baseline[["gy"]])
 # Plot results ####
 # ..............................
 # Pseudo R-squared boxplot ####
-load("processing/plmodels/models.rda")
 # .............................................
 # .............................................
 # Panel B, Reliability ####

@@ -19,7 +19,7 @@
 
 # Other files
 /temporary
-/processing/plmodels
+/processing/plmodels/
 /manuscript
 /data/SRTM_NE_250m.tif
 .Rproj.user
