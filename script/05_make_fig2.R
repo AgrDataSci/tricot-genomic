@@ -10,6 +10,7 @@ source("script/helper_00_functions.R")
 
 sessioninfo::session_info()
 # write session info
+dir.create("script/session_info", recursive = TRUE, showWarnings = FALSE)
 capture.output(sessioninfo::session_info(),
                file = "script/session_info/05_make_fig2.txt")
 
@@ -350,6 +351,8 @@ p3 <-
 p3
 
 p <- p1 + (p2 / p3) + plot_layout(ncol = 2, widths = c(2, 1))
+
+p
 
 # save as svg
 ggsave(paste0("manuscript/display_items/", "Fig2.svg"),
