@@ -112,6 +112,18 @@ nodes <- ifelse(nodes[,1] == "2", "node 3",
                 ifelse(nodes[,1] == "3" & nodes[,3] == "2", "node 4",
                        ifelse(nodes[,1] == "3" & nodes[,3] == "3", "node 5", NA)))
 
+
+# get the worth parameters
+wp <- as.data.frame(pr)
+wp <- cbind(node = nodes, wp)
+wp <- wp[!duplicated(wp$node), ]
+wp <- t(wp)
+wp <- as.data.frame(wp, stringsAsFactors = FALSE)
+names(wp) <- gsub(" ","",paste0("worth_",wp[1,]))
+wp$genotype <- rownames(wp)
+wp <- wp[-1,]
+wp[,1:3] <- lapply(wp[,1:3], as.numeric)
+
 # get the reference variety from each plot
 R <- dt$G
 R <- R[1:length(R),,as.grouped_rankings = FALSE]
@@ -215,7 +227,10 @@ pca$group <- ifelse(is.na(pca$group), "Other genotypes", pca$group)
 pca$group <- factor(pca$group, levels = c("3DB Cold tolerant","3DB Warm tolerant",
                                           "Currently recommended","Other genotypes"))
 
-p1<-
+pca <- merge(pca, wp, by = "genotype")
+
+
+p1 <-
 ggplot() +
   geom_point(data = pca, 
              aes(x = PC1, y = PC2, fill = group, 
