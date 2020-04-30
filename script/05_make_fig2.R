@@ -191,28 +191,30 @@ p2 <- ggplot(rel,
              aes(y = reliability, 
                  group = best, 
                  x = best, fill = best)) +
-  geom_boxplot(outlier.size = 0.5, show.legend = FALSE, colour = "grey30") +
-  scale_fill_manual(values= c("#2166ac","#6baed6","#9ecae1")) + 
+  geom_boxplot(outlier.size = 0.5, show.legend = FALSE, 
+               colour = "grey20", 
+               alpha = 0.85) +
+  scale_fill_manual(values= c("#2171b5", "#4292c6","#6baed6")) +
   labs(y = "Probability of outperforming",
        x = c(""),
        title = "B") +
   scale_y_continuous(limits = c(.8, .95),
                      breaks = seq(8, 10, 0.5)/10) +
   theme(axis.text.x = element_text(size=12, angle = 0,
-                                   face="plain", colour = "grey30"),
+                                   face="plain", colour = "grey20"),
         axis.text.y = element_text(size=12, angle = 0,
                                    hjust=1, vjust=0.5,
-                                   face="plain", colour = "grey30"),
-        axis.title.y = element_text(size=12, colour = "grey30"),
-        axis.line = element_line(colour = "grey30"),
+                                   face="plain", colour = "grey20"),
+        axis.title.y = element_text(size=12, colour = "grey20"),
+        axis.line = element_line(colour = "grey20"),
         plot.background = element_blank(),
         panel.background = element_blank(),
         panel.border = element_rect(linetype = "solid",
                                     fill = NA,
-                                    colour = "grey30"),
+                                    colour = "grey20"),
         plot.margin = unit(c(3,3,1,3), "mm"),
         plot.title = element_text(size=16, 
-                                  colour = "grey30", 
+                                  colour = "grey20", 
                                   face = "bold"),
         text = element_text(family = "sans"))
 
@@ -242,122 +244,46 @@ pca$mean_worth <- rowMeans(pca[,paste0("worth_node", 3:5)])
 
 p1 <- 
 ggplot() +
-  geom_point(data = pca,
-             aes(x = PC1, y = PC2, color = mean_worth),
-             shape = 19, size = 4) +
-  scale_color_gradientn(colours = c("gray70", "gray30"),
-                        breaks = c(min(pca$mean_worth), max(pca$mean_worth)),
-                        labels = c("Low", "High"),
-                        name = "Overall appreciation") +
-  geom_point(data = pca[pca$group=="Currently recommended",],
-             aes(x = PC1, y = PC2), col = "#FF00FF", size = 2) +
-  geom_point(data = pca[pca$group=="3DB Cold tolerant",],
-             aes(x = PC1, y = PC2), col = "#225ea8", size = 2) +
-  geom_point(data = pca[pca$group=="3DB Warm tolerant",],
-             aes(x = PC1, y = PC2), col = "#f03b20", size = 2) +
+  geom_point(data = pca, 
+             aes(x = PC1, y = PC2, 
+                 color = group, 
+                 size = mean_worth), 
+             shape = 19, alpha = 0.75) +
+  scale_alpha(guide = 'none') +
+  scale_size_continuous(name = "Overall appreciation",
+                        breaks = as.vector(quantile(pca$mean_worth)),
+                        labels = c("Low",""," ","  ","High")) +
+  scale_color_manual(values= c("#225ea8","#f03b20","#FF00FF","grey50"),
+                     name = "Genotype") +
   labs(x = "PC1 (24.1%)",
        y = "PC2 (10.5%)",
        title = "A") +
   theme(axis.text.x = element_text(size = 12, angle = 0,
-                                   face = "plain", colour = "grey30"),
+                                   face = "plain", colour = "grey20"),
         axis.text.y = element_text(size = 12, angle = 0,
                                    hjust = 1, vjust = 0.5,
-                                   face = "plain", colour = "grey30"),
-        axis.title.y = element_text(size = 12, colour = "grey30"),
-        axis.title.x = element_text(size = 12, colour = "grey30"),
+                                   face = "plain", colour = "grey20"),
+        axis.title.y = element_text(size = 12, colour = "grey20"),
+        axis.title.x = element_text(size = 12, colour = "grey20"),
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
-        legend.text = element_text(size = 10, color = "grey30"),
-        legend.title = element_text(size = 11, face = "bold", colour = "grey30"),
-        legend.position = c(0.22,0.78),
+        legend.text = element_text(size = 10, color = "grey20"),
+        legend.title = element_text(size = 11, face = "bold", colour = "grey20"),
+        legend.position = c(0.22,0.72),
         legend.background = element_blank(),
         legend.key.size = unit(0.3, "cm"),
         legend.box.background = element_blank(),
         legend.key = element_blank(),
         panel.grid.major = element_blank(),
-        panel.border = element_rect(linetype = "solid", fill = NA, color = "grey30"),
+        panel.border = element_rect(linetype = "solid", fill = NA, color = "grey20"),
         plot.margin = unit(c(3,3,1,3), "mm"),
         plot.title = element_text(size = 16, 
-                                  colour = "grey30", 
+                                  colour = "grey20", 
                                   face = "bold"),
         text = element_text(family = "sans"))
+
 
 p1
-
-p11 <- 
-ggplot() +
-  geom_point(data = pca,
-             aes(x = PC1, y = PC2, color = group, shape = group), shape = 19, size = 3) +
-  scale_color_manual(values= c("#225ea8","#f03b20","#FF00FF","gray80"),
-                               name = "Genotype") +
-  labs(x = "PC1 (24.1%)",
-       y = "PC2 (10.5%)",
-       title = "A") +
-  theme(axis.text.x = element_text(size = 12, angle = 0,
-                                   face = "plain", colour = "grey30"),
-        axis.text.y = element_text(size = 12, angle = 0,
-                                   hjust = 1, vjust = 0.5,
-                                   face = "plain", colour = "grey30"),
-        axis.title.y = element_text(size = 12, colour = "grey30"),
-        axis.title.x = element_text(size = 12, colour = "grey30"),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        legend.text = element_text(size = 10, color = "grey30"),
-        legend.title = element_text(size = 11, face = "bold", colour = "grey30"),
-        legend.position = c(0.22,0.78),
-        legend.background = element_blank(),
-        legend.key.size = unit(0.3, "cm"),
-        legend.box.background = element_blank(),
-        legend.key = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.border = element_rect(linetype = "solid", fill = NA, color = "grey30"),
-        plot.margin = unit(c(3,3,1,3), "mm"),
-        plot.title = element_text(size = 16, 
-                                  colour = "grey30", 
-                                  face = "bold"),
-        text = element_text(family = "sans"))
-
-p11
-
-
-ggplot() +
-  geom_point(data = pca,
-             aes(x = PC1, y = PC2, fill = mean_worth),
-             shape = 21, size = 4) +
-  scale_fill_gradientn(colors = c("gray70", "gray30"),
-                       breaks = c(min(pca$mean_worth), max(pca$mean_worth)),
-                       labels = c("Low", "High"),
-                       name = "Overall appreciation") +
-  geom_point(data = pca, 
-             aes(x = PC1, y = PC2, color = group), shape = 21, size = 4) +
-  scale_color_manual(values= c("#225ea8","#f03b20","#FF00FF","grey50"),
-                    name = "Genotype") +
-  labs(x = "PC1 (24.1%)",
-       y = "PC2 (10.5%)",
-       title = "A") +
-  theme(axis.text.x = element_text(size = 12, angle = 0,
-                                   face = "plain", colour = "grey30"),
-        axis.text.y = element_text(size = 12, angle = 0,
-                                   hjust = 1, vjust = 0.5,
-                                   face = "plain", colour = "grey30"),
-        axis.title.y = element_text(size = 12, colour = "grey30"),
-        axis.title.x = element_text(size = 12, colour = "grey30"),
-        panel.grid.minor = element_blank(),
-        panel.background = element_blank(),
-        legend.text = element_text(size = 10, color = "grey30"),
-        legend.title = element_text(size = 11, face = "bold", colour = "grey30"),
-        legend.position = c(0.22,0.75),
-        legend.background = element_blank(),
-        legend.key.size = unit(0.3, "cm"),
-        legend.box.background = element_blank(),
-        legend.key = element_blank(),
-        panel.grid.major = element_blank(),
-        panel.border = element_rect(linetype = "solid", fill = NA, color = "grey30"),
-        plot.margin = unit(c(3,3,1,3), "mm"),
-        plot.title = element_text(size = 16, 
-                                  colour = "grey30", 
-                                  face = "bold"),
-        text = element_text(family = "sans"))
 
 # .................................
 # Panel C, Bar plot over the time series ####
@@ -424,7 +350,7 @@ every_n_labeler <- function(n = 3) {
 p3 <- 
   ggplot(yield, aes(y = gain, x = year, fill = model)) +
   geom_bar(stat = "identity",
-           position = position_dodge()) +
+           position = position_dodge(), alpha = 0.9) +
   geom_errorbar(aes(ymin = se_min, ymax = se_max), 
                 width = 0.1,
                 position = position_dodge(1)) +
@@ -438,14 +364,14 @@ p3 <-
   scale_fill_manual(values = c("#3182bd"), 
                       name = "") +
   theme(axis.text.x = element_text(size = 12, angle = 0,
-                                   face="plain", colour = "grey30"),
-        axis.title.x = element_text(size=12, colour = "grey30"),
+                                   face="plain", colour = "grey20"),
+        axis.title.x = element_text(size=12, colour = "grey20"),
         axis.text.y = element_text(size=12, angle = 0,
                                    hjust=1, vjust=0.5,
-                                   face="plain", colour = "grey30"),
-        axis.title.y = element_text(size=12, colour = "grey30"),
-        axis.line = element_line(colour = "grey30"),
-        legend.text = element_text(size=12, colour="grey30"),
+                                   face="plain", colour = "grey20"),
+        axis.title.y = element_text(size=12, colour = "grey20"),
+        axis.line = element_line(colour = "grey20"),
+        legend.text = element_text(size=12, colour="grey20"),
         legend.key = element_rect(colour = NA, fill = NA ,
                                   size=0.5,linetype = 1),
         legend.position = "none",
@@ -453,20 +379,16 @@ p3 <-
         panel.background = element_blank(),
         panel.border = element_rect(linetype = "solid",
                                     fill = NA,
-                                    colour = "grey30"),
+                                    colour = "grey20"),
         plot.margin = unit(c(2,3,3,3), "mm"),
         plot.title = element_text(size=16, 
-                                  colour = "grey30", 
+                                  colour = "grey20", 
                                   face = "bold"),
         text = element_text(family = "sans"))
 
 p3
 
-pf <- p12 + (p2 / p3) + plot_layout(ncol = 2, widths = c(2, 1))
-
-
-
-pf2 <- p11 + (p2 / p3) + plot_layout(ncol = 2, widths = c(2, 1))
+pf <- p1 + (p2 / p3) + plot_layout(ncol = 2, widths = c(2, 1))
 
 # save as svg
 ggsave(paste0("manuscript/display_items/", "Fig2.svg"),
@@ -475,17 +397,132 @@ ggsave(paste0("manuscript/display_items/", "Fig2.svg"),
        height = 14,
        units = "cm")
 
-# save as svg
-ggsave(paste0("manuscript/display_items/", "Fig2_2.svg"),
-       plot = pf2,
-       width = 21,
-       height = 14,
-       units = "cm")
-
-
 # save as png
 ggsave(paste0("manuscript/display_items/", "Fig2.png"),
        plot = pf,
        width = 21,
        height = 14,
+       dpi = 600,
        units = "cm")
+
+
+
+
+# p1 <- 
+#   ggplot() +
+#   geom_point(data = pca,
+#              aes(x = PC1, y = PC2, color = mean_worth),
+#              shape = 19, size = 4) +
+#   scale_color_gradientn(colours = c("gray70", "gray30"),
+#                         breaks = c(min(pca$mean_worth), max(pca$mean_worth)),
+#                         labels = c("Low", "High"),
+#                         name = "Overall appreciation") +
+#   geom_point(data = pca[pca$group=="Currently recommended",],
+#              aes(x = PC1, y = PC2), col = "#FF00FF", size = 2) +
+#   geom_point(data = pca[pca$group=="3DB Cold tolerant",],
+#              aes(x = PC1, y = PC2), col = "#225ea8", size = 2) +
+#   geom_point(data = pca[pca$group=="3DB Warm tolerant",],
+#              aes(x = PC1, y = PC2), col = "#f03b20", size = 2) +
+#   labs(x = "PC1 (24.1%)",
+#        y = "PC2 (10.5%)",
+#        title = "A") +
+#   theme(axis.text.x = element_text(size = 12, angle = 0,
+#                                    face = "plain", colour = "grey20"),
+#         axis.text.y = element_text(size = 12, angle = 0,
+#                                    hjust = 1, vjust = 0.5,
+#                                    face = "plain", colour = "grey20"),
+#         axis.title.y = element_text(size = 12, colour = "grey20"),
+#         axis.title.x = element_text(size = 12, colour = "grey20"),
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank(),
+#         legend.text = element_text(size = 10, color = "grey20"),
+#         legend.title = element_text(size = 11, face = "bold", colour = "grey20"),
+#         legend.position = c(0.22,0.78),
+#         legend.background = element_blank(),
+#         legend.key.size = unit(0.3, "cm"),
+#         legend.box.background = element_blank(),
+#         legend.key = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.border = element_rect(linetype = "solid", fill = NA, color = "grey20"),
+#         plot.margin = unit(c(3,3,1,3), "mm"),
+#         plot.title = element_text(size = 16, 
+#                                   colour = "grey20", 
+#                                   face = "bold"),
+#         text = element_text(family = "sans"))
+# 
+# p1
+# 
+# p11 <- 
+#   ggplot() +
+#   geom_point(data = pca,
+#              aes(x = PC1, y = PC2, color = group, shape = group), shape = 19, size = 3) +
+#   scale_color_manual(values= c("#225ea8","#f03b20","#FF00FF","gray80"),
+#                      name = "Genotype") +
+#   labs(x = "PC1 (24.1%)",
+#        y = "PC2 (10.5%)",
+#        title = "A") +
+#   theme(axis.text.x = element_text(size = 12, angle = 0,
+#                                    face = "plain", colour = "grey20"),
+#         axis.text.y = element_text(size = 12, angle = 0,
+#                                    hjust = 1, vjust = 0.5,
+#                                    face = "plain", colour = "grey20"),
+#         axis.title.y = element_text(size = 12, colour = "grey20"),
+#         axis.title.x = element_text(size = 12, colour = "grey20"),
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank(),
+#         legend.text = element_text(size = 10, color = "grey20"),
+#         legend.title = element_text(size = 11, face = "bold", colour = "grey20"),
+#         legend.position = c(0.22,0.78),
+#         legend.background = element_blank(),
+#         legend.key.size = unit(0.3, "cm"),
+#         legend.box.background = element_blank(),
+#         legend.key = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.border = element_rect(linetype = "solid", fill = NA, color = "grey20"),
+#         plot.margin = unit(c(3,3,1,3), "mm"),
+#         plot.title = element_text(size = 16, 
+#                                   colour = "grey20", 
+#                                   face = "bold"),
+#         text = element_text(family = "sans"))
+# 
+# p11
+
+# p12 <-
+#   ggplot() +
+#   geom_point(data = pca,
+#              aes(x = PC1, y = PC2, fill = mean_worth),
+#              shape = 21, size = 4) +
+#   scale_fill_gradientn(colors = c("gray70", "gray30"),
+#                        breaks = c(min(pca$mean_worth), max(pca$mean_worth)),
+#                        labels = c("Low", "High"),
+#                        name = "Overall appreciation") +
+#   geom_point(data = pca, 
+#              aes(x = PC1, y = PC2, color = group), shape = 21, size = 4) +
+#   scale_color_manual(values= c("#225ea8","#f03b20","#FF00FF","grey50"),
+#                      name = "Genotype") +
+#   labs(x = "PC1 (24.1%)",
+#        y = "PC2 (10.5%)",
+#        title = "A") +
+#   theme(axis.text.x = element_text(size = 12, angle = 0,
+#                                    face = "plain", colour = "grey20"),
+#         axis.text.y = element_text(size = 12, angle = 0,
+#                                    hjust = 1, vjust = 0.5,
+#                                    face = "plain", colour = "grey20"),
+#         axis.title.y = element_text(size = 12, colour = "grey20"),
+#         axis.title.x = element_text(size = 12, colour = "grey20"),
+#         panel.grid.minor = element_blank(),
+#         panel.background = element_blank(),
+#         legend.text = element_text(size = 10, color = "grey20"),
+#         legend.title = element_text(size = 11, face = "bold", colour = "grey20"),
+#         legend.position = c(0.22,0.75),
+#         legend.background = element_blank(),
+#         legend.key.size = unit(0.3, "cm"),
+#         legend.box.background = element_blank(),
+#         legend.key = element_blank(),
+#         panel.grid.major = element_blank(),
+#         panel.border = element_rect(linetype = "solid", fill = NA, color = "grey20"),
+#         plot.margin = unit(c(3,3,1,3), "mm"),
+#         plot.title = element_text(size = 16, 
+#                                   colour = "grey20", 
+#                                   face = "bold"),
+#         text = element_text(family = "sans"))
