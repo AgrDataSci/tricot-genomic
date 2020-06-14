@@ -5,6 +5,9 @@
 
 # Session Data files
 .RData
+.pdf
+.xlsx
+.docx
 
 # RStudio files
 .Rproj.user/
@@ -21,5 +24,6 @@
 /temporary
 /processing/plmodels/
 /manuscript
+/manuscript/old_versions
 /data/SRTM_NE_250m.tif
 .Rproj.user
