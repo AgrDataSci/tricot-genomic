@@ -1,5 +1,6 @@
 <!-- badges: start -->
 [![dataverse](https://img.shields.io/badge/Dataverse-10.7910%2FDVN%2FOEZGVP-orange)](https://doi.org/10.7910/DVN/OEZGVP)
+[![License](https://img.shields.io/badge/License-CC%20BY%204.0-blue.svg)](https://creativecommons.org/licenses/by/4.0/)
 <!-- badges: end -->
 
 ## Data-driven decentralized breeding increases genetic gain in a challenging crop production environment 
