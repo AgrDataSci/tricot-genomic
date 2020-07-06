@@ -11,6 +11,8 @@ Crop breeding must embrace the broad diversity of smallholder agricultural syste
 
 * A citable mirror of this repository is available through [Dataverse](https://doi.org/10.7910/DVN/OEZGVP).
 
+* License CC BY 4.0
+
 ## Acknowledgments
 
 We thank all farmers who evaluated the genotypes in both centralized and decentralized trials. This work was implemented as part of the CGIAR Research Program on Climate Change, Agriculture and Food Security (CCAFS), which is carried out with support from the CGIAR Trust Fund and through bilateral funding agreements. For details please visit https://ccafs.cgiar.org/donors. This work was supported by the Doctoral School for Agrobiodiversity at Scuola Superiore Sant’Anna and by The Nordic Joint Committee for Agricultural and Food Research (grant num. 202100-2817).
