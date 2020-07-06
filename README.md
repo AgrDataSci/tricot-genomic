@@ -11,7 +11,7 @@ Crop breeding must embrace the broad diversity of smallholder agricultural syste
 
 * A citable mirror of this repository is available through [Dataverse](https://doi.org/10.7910/DVN/OEZGVP).
 
-* License CC BY 4.0
+* License [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)
 
 ## Acknowledgments
 
