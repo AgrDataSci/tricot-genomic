@@ -1,10 +1,10 @@
-# Data-driven decentralized breeding increases genetic gain in challenging crop production environments 
+# Data-driven decentralized breeding increases genetic gain in a challenging crop production environment 
 
-Crop breeding must embrace the broad diversity of smallholder agricultural systems to ensure food security to the hundreds of millions of people living in marginal production environments. This challenge can be addressed by combining genomics, farmers’ knowledge, and environmental analysis into a data-driven decentralized method called 3D-breeding. We tested this approach with durum wheat (*Triticum durum* Desf.) in 1,165 farmer plots distributed across the Ethiopian highlands. We found that 3D-breeding could double the accuracy of the benchmark representing genomic selection applied to conventional breeding. 3D-breeding could identify genotypes with enhanced local adaptation providing consistent yield advantages across seasons and locations. We propose 3D-breeding to leverage the diversity of farmer fields to change the paradigm of plant breeding for local adaptation in a changing climate.
+Crop breeding must embrace the broad diversity of smallholder agricultural systems to ensure food security to the hundreds of millions of people living in marginal production environments. This challenge can be addressed by combining genomics, farmers’ knowledge, and environmental analysis into a data-driven decentralised approach (3D-breeding). We tested this idea as a proof-of-concept by comparing a durum wheat (*Triticum durum* Desf.) decentralised trial distributed as incomplete blocks in 1,165 farmer-managed plots across the Ethiopian highlands with a benchmark representing genomic selection applied to conventional breeding. We found that 3D-breeding could double the accuracy of the benchmark. 3D-breeding could identify genotypes with enhanced local adaptation providing consistent yield advantages across seasons and locations. We propose this decentralised approach to leverage the diversity in farmers’ fields and change the paradigm of plant breeding for local adaptation in challenging crop production environments.
 
 # Dataverse
 
-A citable mirror of this repository is available through [Dataverse](https://dataverse.harvard.edu/dataverse/Bioversity).
+A citable mirror of this repository is available through [Dataverse](https://doi.org/10.7910/DVN/OEZGVP).
 
 # Acknowledgments
 
