@@ -32,7 +32,6 @@ rm(imputedcl, hmp)
 #.................................................
 #.................................................
 # PlackettLuce rankings ####
-
 G <- rank_numeric(data = df,
                   items = "genotype",
                   input = "farmer_rank",
@@ -196,7 +195,7 @@ coeffs <- lapply(coeffs, function(X){
 
 # get item names
 items <- rownames(coeffs[[1]])
-items <- items[grepl("_D", items)]
+items <- rev(items[grepl("_D", items)])
 # Add limits in error bars and item names
 coeffs <- lapply(coeffs, function(X){
   X <- X[items, ]
@@ -271,6 +270,7 @@ plots
 
 p <- plots[[1]] | plots[[2]] | plots[[3]]
 p
+
 ggsave("output/SI/pltree.svg",
        plot = p,
        width = 25,
@@ -281,82 +281,5 @@ svg("output/SI/plt.svg", width = 7, height = 8, pointsize = 15)
 plot(plt)
 dev.off()
 
-# Plot R-squared
-pr2 <- c(as.vector(unlist(gen_gy$raw$estimators[,7])),
-         as.vector(unlist(gen$raw$estimators$MaxLik)))
 
-model <- factor(rep(c("GY","OA"),
-                    each = length(gen$raw$models)),
-                levels = c("GY","OA"))
 
-model
-pr2
-
-pr2 <- tibble(value = pr2,
-              model = model)
-
-pr2
-
-p1 <- ggplot(pr2,
-             aes(y = value, group = model, x = model, fill = model)) +
-  geom_boxplot(outlier.size = 0.5, size = 0.3, show.legend = FALSE) +
-  scale_fill_manual(values= c("#d73027","#2166ac")) +
-  labs(y = bquote('Pseudo-R' ^2*''),
-       x = "",
-       title = "") +
-  scale_y_continuous(limits = c(0.35, 0.6),
-                     breaks =  seq(35,60, 5)/100) +
-  theme(axis.text.x = element_text(size = 12, angle = 0,
-                                   face = "plain", colour = "black"),
-        axis.text.y = element_text(size = 12, angle = 0,
-                                   hjust = 1, vjust = 0.5,
-                                   face = "plain", colour = "black"),
-        axis.title.y = element_text(size = 12, colour = "black"),
-        axis.line = element_line(colour = "black"),
-        plot.background = element_blank(),
-        panel.background = element_blank(),
-        panel.border = element_rect(linetype = "solid",
-                                    fill = NA),
-        plot.margin = unit(c(3,3,1,3), "mm"),
-        plot.title = element_text(size=16,
-                                  colour = "black",
-                                  face = "bold"))
-p1
-
-# save as svg
-ggsave(paste0("manuscript/display_items/SI/", "FigS13.png"),
-       plot = p1,
-       width = 10,
-       height = 10,
-       units = "cm")
-
-# #......................................
-# #......................................
-# # now predict OA >> GY and GY >> OA
-# source("script/helper_00_functions.R")
-# 
-# pred_gen_gy <- predict_cv(gen_gy, newdata = mydata)
-# 
-# OA <- G[1:length(G), , as.grouped_rankings = FALSE]
-# 
-# kOA <- rep(NA, nrow(OA))
-# 
-# for(i in seq_along(kOA)){
-#   kOA[i] <- kendallTau(pred_gen_gy[i, ], OA[i, ])[[1]]
-# }
-# 
-# mean(kOA, na.rm = TRUE)
-# sd(kOA, na.rm = TRUE)
-# 
-# pred_oa_gy <- predict_cv(gen, newdata = dataGY)
-# 
-# GY <- GY[1:length(GY), , as.grouped_rankings = FALSE]
-# 
-# kGY <- rep(NA, nrow(GY))
-# 
-# for(i in seq_along(kGY)){
-#   kGY[i] <- kendallTau(pred_oa_gy[i, ], GY[i, ])[[1]]
-# }
-# 
-# mean(kGY)
-# sd(kGY)

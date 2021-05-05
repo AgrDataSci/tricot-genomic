@@ -17,7 +17,7 @@ capture.output(sessioninfo::session_info(),
 # ......................................
 # .....................................
 # Output dir
-#output <- "output/reliability_yield_gain/"
+# output <- "output/reliability_yield_gain/"
 output <- "manuscript/display_items/"
 dir.create(output,
            showWarnings = FALSE,
@@ -178,7 +178,7 @@ table(rel$gen[rel$node=="node 3"])
 table(rel$gen[rel$node=="node 4"])
 table(rel$gen[rel$node=="node 5"])
 
-node4 <- c("048ET_D","060ET_D","169ET_D")##"415ET_D")
+node4 <- c("048ET_D","060ET_D","169ET_D")
 node3 <- table(rel$gen[rel$node=="node 3"])
 node3 <- names(node3)[!names(node3) %in% node4]
 
@@ -270,7 +270,7 @@ ggplot() +
         legend.text = element_text(size = 10, color = "black"),
         legend.title = element_text(size = 11, face = "bold", colour = "black"),
         legend.position = c(0.22,0.72),
-        legend.background = element_blank(),
+        legend.background = element_rect(fill = "grey95"),
         legend.key.size = unit(0.3, "cm"),
         legend.box.background = element_blank(),
         legend.key = element_blank(),
@@ -389,6 +389,8 @@ p3 <-
 p3
 
 pf <- p1 + (p2 / p3) + plot_layout(ncol = 2, widths = c(2, 1))
+
+pf
 
 # save as svg
 ggsave(paste0("manuscript/display_items/", "Fig2.svg"),
